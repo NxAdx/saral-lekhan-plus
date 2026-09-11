@@ -709,7 +709,32 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append(".toast-pill.show { transform: translateY(0); opacity: 1; }\n");
         sb.append(".toast-pill.success { border-color: var(--success); color: var(--success); }\n");
         sb.append(".toast-pill.error { border-color: var(--danger); color: var(--danger); }\n");
-
+        
+        // Print Styles (Clean, ink-friendly document layout)
+        sb.append("@media print {\n");
+        sb.append("  @page { margin: 20mm 15mm; size: auto; }\n");
+        sb.append("  body { background: #ffffff !important; color: #111111 !important; display: block !important; height: auto !important; overflow: visible !important; }\n");
+        sb.append("  .sidebar, .editor-topbar, .styling-toolbar, .editor-bottombar, .trash-bar, .trash-alert-banner, .toast-pill, .raw-canvas, .segmented-control { display: none !important; }\n");
+        sb.append("  .editor-panel { display: block !important; background: #ffffff !important; height: auto !important; overflow: visible !important; width: 100% !important; }\n");
+        sb.append("  .editor-canvas { padding: 0 !important; display: block !important; height: auto !important; overflow: visible !important; }\n");
+        sb.append("  .editor-title-row { margin-bottom: 8px !important; }\n");
+        sb.append("  .editor-title-input { color: #000000 !important; font-size: 24pt !important; font-weight: 700 !important; border: none !important; outline: none !important; padding: 0 !important; width: 100% !important; }\n");
+        sb.append("  .editor-tag-row { margin-bottom: 18px !important; }\n");
+        sb.append("  .tag-input-capsule { background: transparent !important; border: 1px solid #999999 !important; color: #333333 !important; padding: 2px 8px !important; font-size: 10pt !important; }\n");
+        sb.append("  .tag-input-field { color: #333333 !important; font-size: 10pt !important; }\n");
+        sb.append("  .rich-canvas { display: block !important; color: #111111 !important; font-size: 12pt !important; line-height: 1.65 !important; min-height: auto !important; }\n");
+        sb.append("  .rich-canvas h1 { font-size: 20pt !important; color: #000000 !important; margin: 16pt 0 6pt !important; }\n");
+        sb.append("  .rich-canvas h2 { font-size: 16pt !important; color: #111111 !important; margin: 14pt 0 5pt !important; }\n");
+        sb.append("  .rich-canvas h3 { font-size: 13pt !important; color: #222222 !important; margin: 12pt 0 4pt !important; }\n");
+        sb.append("  .rich-canvas p { margin-bottom: 10pt !important; }\n");
+        sb.append("  .rich-canvas pre { background: #f4f4f5 !important; border: 1px solid #d4d4d8 !important; color: #09090b !important; padding: 10pt !important; white-space: pre-wrap !important; word-break: break-word !important; page-break-inside: avoid; }\n");
+        sb.append("  .rich-canvas code { color: #09090b !important; background: #f4f4f5 !important; border: 1px solid #e4e4e7 !important; }\n");
+        sb.append("  .rich-canvas pre code { border: none !important; background: transparent !important; }\n");
+        sb.append("  .rich-canvas blockquote { border-left: 3pt solid #666666 !important; background: #f8f8f8 !important; color: #333333 !important; padding: 6pt 12pt !important; page-break-inside: avoid; }\n");
+        sb.append("  .rich-canvas hr { border-top: 1px solid #cccccc !important; margin: 12pt 0 !important; }\n");
+        sb.append("  .rich-canvas a { color: #000000 !important; text-decoration: underline !important; }\n");
+        sb.append("}\n");
+ 
         sb.append("</style>\n</head>\n<body>\n");
 
         // Sidebar Markup (English only logo)
@@ -747,8 +772,9 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    <div class='topbar-actions' id='topbarActions'>\n");
         sb.append("      <button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button>\n");
         sb.append("      <button class='key-btn' id='pinBtn' onclick='togglePin()' title='Pin Note'>☆ Pin</button>\n");
-        sb.append("      <button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()' title='Move to Trash'>Trash</button>\n");
         sb.append("      <button class='key-btn' id='copyBtn' onclick='copyContent()' title='Copy Note Content'>Copy</button>\n");
+        sb.append("      <button class='key-btn' id='printBtn' onclick='printCurrentNote()' title='Print Note (Ctrl+P)'>🖨️ Print</button>\n");
+        sb.append("      <button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()' title='Move to Trash'>Trash</button>\n");
         sb.append("      <button class='key-btn primary' id='saveBtn' onclick='saveCurrentNote()' title='Save to Phone (Ctrl+S)'>Save to Phone</button>\n");
         sb.append("    </div>\n");
         sb.append("  </div>\n");
@@ -1051,9 +1077,9 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("function renderHeaderActions(isDeleted) {\n");
         sb.append("  const actions = document.getElementById('topbarActions');\n");
         sb.append("  if (isDeleted) {\n");
-        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn success' onclick='restoreNote(${activeNoteId})'>Restore</button><button class='key-btn danger' onclick='deleteForever(${activeNoteId})'>Delete Forever</button>`;\n");
+        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn' id='printBtn' onclick='printCurrentNote()' title='Print Note (Ctrl+P)'>🖨️ Print</button><button class='key-btn success' onclick='restoreNote(${activeNoteId})'>Restore</button><button class='key-btn danger' onclick='deleteForever(${activeNoteId})'>Delete Forever</button>`;\n");
         sb.append("  } else {\n");
-        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn' id='pinBtn' onclick='togglePin()'>${isPinned ? '★ Pinned' : '☆ Pin'}</button><button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()'>Trash</button><button class='key-btn' id='copyBtn' onclick='copyContent()'>Copy</button><button class='key-btn primary' id='saveBtn' onclick='saveCurrentNote()'>Save to Phone</button>`;\n");
+        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn' id='pinBtn' onclick='togglePin()'>${isPinned ? '★ Pinned' : '☆ Pin'}</button><button class='key-btn' id='copyBtn' onclick='copyContent()'>Copy</button><button class='key-btn' id='printBtn' onclick='printCurrentNote()' title='Print Note (Ctrl+P)'>🖨️ Print</button><button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()'>Trash</button><button class='key-btn primary' id='saveBtn' onclick='saveCurrentNote()'>Save to Phone</button>`;\n");
         sb.append("  }\n");
         sb.append("}\n");
  
@@ -1259,6 +1285,14 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  navigator.clipboard.writeText(`# ${title}\\n\\n${text}`);\n");
         sb.append("  showToast('Copied to clipboard!', 'success');\n");
         sb.append("}\n");
+ 
+        sb.append("function printCurrentNote() {\n");
+        sb.append("  syncEditorContentToModel();\n");
+        sb.append("  if (editorMode === 'source') {\n");
+        sb.append("    switchMode('visual');\n");
+        sb.append("  }\n");
+        sb.append("  window.print();\n");
+        sb.append("}\n");
 
         sb.append("function updateCounts() {\n");
         sb.append("  const text = document.getElementById('richEditor').innerText.trim();\n");
@@ -1449,6 +1483,9 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  }\n");
         sb.append("  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'f') {\n");
         sb.append("    e.preventDefault(); document.getElementById('searchInput').focus();\n");
+        sb.append("  }\n");
+        sb.append("  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {\n");
+        sb.append("    e.preventDefault(); printCurrentNote();\n");
         sb.append("  }\n");
         sb.append("});\n");
 

@@ -1,6 +1,7 @@
 # Changelog
 
-## v2.19.28 - Web Share Studio Real-Time Auto-Sync & Manual Refresh
+## v2.19.28 - Web Share Studio Real-Time Auto-Sync, Refresh & Print
+- **Note Printing & PDF Export (`🖨️ Print` & Ctrl+P)**: Added an intuitive Print button to the editor toolbar and keyboard shortcut (`Ctrl+P` / `Cmd+P`). Features dedicated ink-friendly `@media print` typography that strips editor chrome, sidebar, and toolbars, cleanly outputting note title, tags, and formatted content for printers and PDF export.
 - **Real-Time Auto-Sync (Live Updates)**: Web Share Studio automatically polls and synchronizes notes every 3 seconds. Edits made on the mobile phone automatically reload in the active note and refresh the sidebar list in real time without needing page reloads.
 - **Smart Non-Destructive Conflict Guard**: If a user is actively composing or typing unsaved edits in the web studio (`isDirty`), auto-sync protects their work and avoids overwriting edits. The sync status pill alerts the user with a 1-click reload option when ready.
 - **Tactile Refresh Buttons**: Added prominent, animated `🔄 Refresh` buttons to both the sidebar brand header and the editor top action bar for immediate on-demand synchronization with visual spin feedback.
