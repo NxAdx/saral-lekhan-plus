@@ -34,6 +34,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class WebServerModule extends ReactContextBaseJavaModule {
@@ -45,6 +46,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
     private int port = 8085;
     private String primaryServerUrl = null;
     private final AtomicReference<String> notesJsonData = new AtomicReference<>("[]");
+    private final AtomicLong dataVersion = new AtomicLong(System.currentTimeMillis());
 
     private PowerManager.WakeLock wakeLock;
     private WifiManager.WifiLock wifiLock;
@@ -81,6 +83,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
             this.port = requestedPort > 0 ? requestedPort : 8085;
             if (initialNotesJson != null) {
                 this.notesJsonData.set(initialNotesJson);
+                this.dataVersion.set(System.currentTimeMillis());
             }
 
             acquireLocks();
@@ -205,6 +208,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
     public void updateNotesData(String notesJson, Promise promise) {
         if (notesJson != null) {
             this.notesJsonData.set(notesJson);
+            this.dataVersion.incrementAndGet();
         }
         if (promise != null) {
             promise.resolve(true);
@@ -279,7 +283,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            if ("GET".equalsIgnoreCase(method) && "/api/ping".equals(path)) {
+            if ("GET".equalsIgnoreCase(method) && path.startsWith("/api/ping")) {
                 byte[] content = "{\"status\":\"ok\",\"app\":\"Saral Lekhan Plus\",\"version\":\"WebStudio 2.0\"}".getBytes(StandardCharsets.UTF_8);
                 String header = "HTTP/1.1 200 OK\r\n" +
                                 corsHeaders +
@@ -291,11 +295,15 @@ public class WebServerModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            if ("GET".equalsIgnoreCase(method) && "/api/notes".equals(path)) {
+            if ("GET".equalsIgnoreCase(method) && path.startsWith("/api/notes")) {
                 byte[] content = notesJsonData.get().getBytes(StandardCharsets.UTF_8);
                 String header = "HTTP/1.1 200 OK\r\n" +
                                 corsHeaders +
                                 "Content-Type: application/json; charset=UTF-8\r\n" +
+                                "Cache-Control: no-cache, no-store, must-revalidate\r\n" +
+                                "Pragma: no-cache\r\n" +
+                                "Expires: 0\r\n" +
+                                "ETag: \"v" + dataVersion.get() + "\"\r\n" +
                                 "Content-Length: " + content.length + "\r\n\r\n";
                 out.write(header.getBytes(StandardCharsets.UTF_8));
                 out.write(content);
@@ -303,11 +311,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            if ("POST".equalsIgnoreCase(method) && "/api/notes".equals(path)) {
+            if ("POST".equalsIgnoreCase(method) && path.startsWith("/api/notes")) {
                 final String payload = body;
                 if (!payload.isEmpty()) {
                     // Update local in-memory notes cache immediately
                     updateLocalCacheFromPayload(payload);
+                    dataVersion.incrementAndGet();
 
                     // Send event to React Native
                     try {
@@ -469,6 +478,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
                 }
                 notesJsonData.set(newArr.toString());
             }
+            dataVersion.incrementAndGet();
         } catch (Exception e) {
             Log.w(TAG, "Could not update local cache from payload", e);
         }
@@ -604,6 +614,9 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append(".key-btn.danger:hover { background: var(--danger); color: #fff; }\n");
         sb.append(".key-btn.success { background: rgba(16,185,129,0.15); color: var(--success); border-color: var(--success); box-shadow: 0 2px 0 rgba(16,185,129,0.4); }\n");
         sb.append(".key-btn.success:hover { background: var(--success); color: #fff; }\n");
+        sb.append(".refresh-btn-icon { display: inline-block; transition: transform 0.2s ease; }\n");
+        sb.append(".refresh-btn-icon.spin { animation: spin 0.6s cubic-bezier(0.4, 0, 0.2, 1); }\n");
+        sb.append("@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }\n");
 
         // Nav Tabs (All, Pinned, Trash)
         sb.append(".nav-tabs { display: flex; padding: 8px 12px; gap: 6px; border-bottom: 1px solid var(--stroke); background: var(--bg-deep); }\n");
@@ -708,29 +721,31 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    </div>\n");
         sb.append("    <div class='brand-actions'>\n");
         sb.append("      <button class='key-btn icon-only' id='themeToggleBtn' title='Toggle Dark / Light Theme' onclick='toggleTheme()'>🌙</button>\n");
+        sb.append("      <button class='key-btn icon-only' id='sidebarRefreshBtn' title='Refresh notes from phone' onclick='manualRefresh()'><span class='refresh-btn-icon'>🔄</span></button>\n");
         sb.append("      <button class='key-btn primary' id='newNoteBtn' title='Create New Note'>+ New Note</button>\n");
         sb.append("    </div>\n");
         sb.append("  </div>\n");
-
+ 
         // Tabs
         sb.append("  <div class='nav-tabs'>\n");
         sb.append("    <button class='nav-tab active' id='tabAll' onclick=\"switchTab('all')\"><span>All Notes</span><span class='badge-pill' id='badgeAll'>0</span></button>\n");
         sb.append("    <button class='nav-tab' id='tabPinned' onclick=\"switchTab('pinned')\"><span>★ Pinned</span><span class='badge-pill' id='badgePinned'>0</span></button>\n");
         sb.append("    <button class='nav-tab' id='tabTrash' onclick=\"switchTab('trash')\"><span>🗑 Trash</span><span class='badge-pill' id='badgeTrash'>0</span></button>\n");
         sb.append("  </div>\n");
-
+ 
         // Search & Tags
         sb.append("  <div class='search-box'><input type='text' class='search-input' id='searchInput' placeholder='Search notes... (Ctrl+F)'></div>\n");
         sb.append("  <div class='tag-rail' id='tagRail'></div>\n");
         sb.append("  <div id='trashHeaderContainer'></div>\n");
         sb.append("  <div class='notes-list' id='notesList'></div>\n");
         sb.append("</div>\n");
-
+ 
         // Editor Panel Markup
         sb.append("<div class='editor-panel'>\n");
         sb.append("  <div class='editor-topbar'>\n");
         sb.append("    <div class='sync-pill' id='syncStatus'><span>✓ Live Sync Active</span></div>\n");
         sb.append("    <div class='topbar-actions' id='topbarActions'>\n");
+        sb.append("      <button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button>\n");
         sb.append("      <button class='key-btn' id='pinBtn' onclick='togglePin()' title='Pin Note'>☆ Pin</button>\n");
         sb.append("      <button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()' title='Move to Trash'>Trash</button>\n");
         sb.append("      <button class='key-btn' id='copyBtn' onclick='copyContent()' title='Copy Note Content'>Copy</button>\n");
@@ -816,18 +831,63 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("}\n");
         sb.append("applyTheme(currentTheme);\n");
 
-        // Fetch notes
-        sb.append("async function fetchNotes() {\n");
+        // Populate editor fields
+        sb.append("function populateEditorFields(n) {\n");
+        sb.append("  document.getElementById('editTitle').value = n.title || '';\n");
+        sb.append("  document.getElementById('editTag').value = n.tag || '';\n");
+        sb.append("  isPinned = Boolean(n.pinned);\n");
+        sb.append("  updatePinButton();\n");
+        sb.append("  const richEl = document.getElementById('richEditor');\n");
+        sb.append("  const rawEl = document.getElementById('rawEditor');\n");
+        sb.append("  if (editorMode === 'source') {\n");
+        sb.append("    rawEl.value = n.body || '';\n");
+        sb.append("    richEl.innerHTML = n.body || '';\n");
+        sb.append("  } else {\n");
+        sb.append("    richEl.innerHTML = n.body || '';\n");
+        sb.append("    rawEl.value = n.body || '';\n");
+        sb.append("  }\n");
+        sb.append("  renderTrashBanner(Boolean(n.is_deleted));\n");
+        sb.append("  renderHeaderActions(Boolean(n.is_deleted));\n");
+        sb.append("  updateCounts();\n");
+        sb.append("}\n");
+
+        // Fetch notes with real-time change detection and auto-reload
+        sb.append("async function fetchNotes(forceReload = false) {\n");
         sb.append("  try {\n");
-        sb.append("    const res = await fetch('/api/notes');\n");
+        sb.append("    const res = await fetch('/api/notes?t=' + Date.now(), { cache: 'no-store' });\n");
         sb.append("    if (!res.ok) return;\n");
         sb.append("    const data = await res.json();\n");
         sb.append("    const fetched = Array.isArray(data) ? data : [];\n");
-        sb.append("    if (isDirty && activeNoteId) {\n");
-        sb.append("      const current = allNotes.find(x => x.id === activeNoteId);\n");
-        sb.append("      if (current) {\n");
-        sb.append("        const idx = fetched.findIndex(x => x.id === activeNoteId);\n");
-        sb.append("        if (idx !== -1) fetched[idx] = Object.assign({}, fetched[idx], current);\n");
+        sb.append("    if (activeNoteId && !isCreatingNew) {\n");
+        sb.append("      const serverNote = fetched.find(x => x.id === activeNoteId);\n");
+        sb.append("      const localNote = allNotes.find(x => x.id === activeNoteId);\n");
+        sb.append("      if (serverNote) {\n");
+        sb.append("        const hasChanged = !localNote ||\n");
+        sb.append("          serverNote.title !== localNote.title ||\n");
+        sb.append("          serverNote.body !== localNote.body ||\n");
+        sb.append("          (serverNote.tag || '') !== (localNote.tag || '') ||\n");
+        sb.append("          Boolean(serverNote.pinned) !== Boolean(localNote.pinned) ||\n");
+        sb.append("          Boolean(serverNote.is_deleted) !== Boolean(localNote.is_deleted) ||\n");
+        sb.append("          (serverNote.updated_at && localNote.updated_at && serverNote.updated_at !== localNote.updated_at);\n");
+        sb.append("        if (hasChanged) {\n");
+        sb.append("          if (!isDirty || forceReload) {\n");
+        sb.append("            isDirty = false;\n");
+        sb.append("            clearTimeout(autoSaveTimer);\n");
+        sb.append("            populateEditorFields(serverNote);\n");
+        sb.append("            setSyncStatus('✓ Live Sync Active', true);\n");
+        sb.append("            if (forceReload) showToast('Refreshed note from phone!', 'success');\n");
+        sb.append("            else showToast('Note updated from phone', 'success');\n");
+        sb.append("          } else {\n");
+        sb.append("            setSyncStatus('⚠️ Phone updated note (Click Refresh to load)', false);\n");
+        sb.append("          }\n");
+        sb.append("        }\n");
+        sb.append("      }\n");
+        sb.append("      if (isDirty) {\n");
+        sb.append("        const cur = allNotes.find(x => x.id === activeNoteId);\n");
+        sb.append("        if (cur) {\n");
+        sb.append("          const idx = fetched.findIndex(x => x.id === activeNoteId);\n");
+        sb.append("          if (idx !== -1) fetched[idx] = Object.assign({}, fetched[idx], cur);\n");
+        sb.append("        }\n");
         sb.append("      }\n");
         sb.append("    }\n");
         sb.append("    allNotes = fetched;\n");
@@ -838,7 +898,34 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("      const activeList = getFilteredNotes();\n");
         sb.append("      if (activeList.length > 0) selectNote(activeList[0].id);\n");
         sb.append("    }\n");
-        sb.append("  } catch (err) { console.warn('Fetch notes failed:', err); }\n");
+        sb.append("  } catch (err) {\n");
+        sb.append("    console.warn('Fetch notes failed:', err);\n");
+        sb.append("    if (forceReload) throw err;\n");
+        sb.append("  }\n");
+        sb.append("}\n");
+
+        // Manual Refresh with spin animation and dirty check
+        sb.append("async function manualRefresh() {\n");
+        sb.append("  const icons = document.querySelectorAll('.refresh-btn-icon');\n");
+        sb.append("  icons.forEach(i => i.classList.add('spin'));\n");
+        sb.append("  setSyncStatus('Refreshing from phone...', false);\n");
+        sb.append("  try {\n");
+        sb.append("    if (isDirty && activeNoteId) {\n");
+        sb.append("      if (!confirm('You have unsaved changes on this note. Reloading will overwrite with phone data. Continue?')) {\n");
+        sb.append("        icons.forEach(i => i.classList.remove('spin'));\n");
+        sb.append("        setSyncStatus('Live Sync Active', false);\n");
+        sb.append("        return;\n");
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("    await fetchNotes(true);\n");
+        sb.append("    showToast('✓ Refreshed from phone!', 'success');\n");
+        sb.append("    setSyncStatus('✓ Synced with phone', true);\n");
+        sb.append("  } catch (err) {\n");
+        sb.append("    showToast('Error refreshing notes', 'error');\n");
+        sb.append("    setSyncStatus('⚠️ Refresh failed', false);\n");
+        sb.append("  } finally {\n");
+        sb.append("    setTimeout(() => icons.forEach(i => i.classList.remove('spin')), 600);\n");
+        sb.append("  }\n");
         sb.append("}\n");
 
         // Filter notes
@@ -942,20 +1029,10 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  isDirty = false;\n");
         sb.append("  const n = allNotes.find(x => x.id === id);\n");
         sb.append("  if (!n) return;\n");
-        sb.append("  document.getElementById('editTitle').value = n.title || '';\n");
-        sb.append("  document.getElementById('editTag').value = n.tag || '';\n");
-        sb.append("  isPinned = Boolean(n.pinned);\n");
-        sb.append("  updatePinButton();\n");
-        sb.append("  const richEl = document.getElementById('richEditor');\n");
-        sb.append("  const rawEl = document.getElementById('rawEditor');\n");
-        sb.append("  richEl.innerHTML = n.body || '';\n");
-        sb.append("  rawEl.value = n.body || '';\n");
-        sb.append("  renderTrashBanner(Boolean(n.is_deleted));\n");
-        sb.append("  renderHeaderActions(Boolean(n.is_deleted));\n");
+        sb.append("  populateEditorFields(n);\n");
         sb.append("  renderList();\n");
-        sb.append("  updateCounts();\n");
         sb.append("}\n");
-
+ 
         sb.append("function renderTrashBanner(isDeleted) {\n");
         sb.append("  const container = document.getElementById('trashBannerContainer');\n");
         sb.append("  const stylingToolbar = document.getElementById('stylingToolbar');\n");
@@ -970,16 +1047,16 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    richEditor.contentEditable = 'true';\n");
         sb.append("  }\n");
         sb.append("}\n");
-
+ 
         sb.append("function renderHeaderActions(isDeleted) {\n");
         sb.append("  const actions = document.getElementById('topbarActions');\n");
         sb.append("  if (isDeleted) {\n");
-        sb.append("    actions.innerHTML = `<button class='key-btn success' onclick='restoreNote(${activeNoteId})'>Restore</button><button class='key-btn danger' onclick='deleteForever(${activeNoteId})'>Delete Forever</button>`;\n");
+        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn success' onclick='restoreNote(${activeNoteId})'>Restore</button><button class='key-btn danger' onclick='deleteForever(${activeNoteId})'>Delete Forever</button>`;\n");
         sb.append("  } else {\n");
-        sb.append("    actions.innerHTML = `<button class='key-btn' id='pinBtn' onclick='togglePin()'>${isPinned ? '★ Pinned' : '☆ Pin'}</button><button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()'>Trash</button><button class='key-btn' id='copyBtn' onclick='copyContent()'>Copy</button><button class='key-btn primary' id='saveBtn' onclick='saveCurrentNote()'>Save to Phone</button>`;\n");
+        sb.append("    actions.innerHTML = `<button class='key-btn' id='topbarRefreshBtn' onclick='manualRefresh()' title='Refresh note from phone'><span class='refresh-btn-icon'>🔄</span> Refresh</button><button class='key-btn' id='pinBtn' onclick='togglePin()'>${isPinned ? '★ Pinned' : '☆ Pin'}</button><button class='key-btn danger' id='deleteBtn' onclick='trashCurrentNote()'>Trash</button><button class='key-btn' id='copyBtn' onclick='copyContent()'>Copy</button><button class='key-btn primary' id='saveBtn' onclick='saveCurrentNote()'>Save to Phone</button>`;\n");
         sb.append("  }\n");
         sb.append("}\n");
-
+ 
         sb.append("function updatePinButton() {\n");
         sb.append("  const btn = document.getElementById('pinBtn');\n");
         sb.append("  if (btn) {\n");
@@ -987,28 +1064,31 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    if (isPinned) btn.classList.add('primary'); else btn.classList.remove('primary');\n");
         sb.append("  }\n");
         sb.append("}\n");
-
+ 
         sb.append("function togglePin() {\n");
         sb.append("  isPinned = !isPinned;\n");
         sb.append("  updatePinButton();\n");
         sb.append("  isDirty = true;\n");
         sb.append("  triggerAutoSave();\n");
         sb.append("}\n");
-
+ 
         sb.append("function triggerAutoSave() {\n");
         sb.append("  clearTimeout(autoSaveTimer);\n");
         sb.append("  setSyncStatus('Saving...', false);\n");
         sb.append("  autoSaveTimer = setTimeout(() => { saveCurrentNote(true); }, 1200);\n");
         sb.append("}\n");
-
+ 
         sb.append("function setSyncStatus(text, isSaved) {\n");
         sb.append("  const el = document.getElementById('syncStatus');\n");
         sb.append("  if (el) {\n");
         sb.append("    el.innerHTML = `<span>${text}</span>`;\n");
         sb.append("    const isFailed = text.includes('failed');\n");
-        sb.append("    el.className = 'sync-pill' + (isSaved ? ' saved' : (isFailed ? ' failed' : ''));\n");
+        sb.append("    const isReloadPrompt = text.includes('Click Refresh');\n");
+        sb.append("    el.className = 'sync-pill' + (isSaved ? ' saved' : (isFailed || isReloadPrompt ? ' failed' : ''));\n");
         sb.append("    if (isFailed) {\n");
         sb.append("      el.onclick = () => saveCurrentNote(false);\n");
+        sb.append("    } else if (isReloadPrompt) {\n");
+        sb.append("      el.onclick = () => manualRefresh();\n");
         sb.append("    } else {\n");
         sb.append("      el.onclick = null;\n");
         sb.append("    }\n");
@@ -1373,7 +1453,7 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("});\n");
 
         sb.append("fetchNotes();\n");
-        sb.append("setInterval(fetchNotes, 4000);\n");
+        sb.append("setInterval(() => fetchNotes(false), 3000);\n");
         sb.append("</script>\n</body>\n</html>\n");
         return sb.toString();
     }

@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.19.28 - Web Share Studio Real-Time Auto-Sync & Manual Refresh
+- **Real-Time Auto-Sync (Live Updates)**: Web Share Studio automatically polls and synchronizes notes every 3 seconds. Edits made on the mobile phone automatically reload in the active note and refresh the sidebar list in real time without needing page reloads.
+- **Smart Non-Destructive Conflict Guard**: If a user is actively composing or typing unsaved edits in the web studio (`isDirty`), auto-sync protects their work and avoids overwriting edits. The sync status pill alerts the user with a 1-click reload option when ready.
+- **Tactile Refresh Buttons**: Added prominent, animated `🔄 Refresh` buttons to both the sidebar brand header and the editor top action bar for immediate on-demand synchronization with visual spin feedback.
+- **Cache-Busting & Endpoint Hardening**: Added strict `Cache-Control: no-cache, no-store, must-revalidate` HTTP headers, `ETag`, and tolerant query-parameter matching to prevent browser caching of stale notes.
+- **Multi-Byte Raw Stream Handling**: Fixed HTTP payload truncation on emojis, Devanagari text, and markdown tables by switching socket stream consumption to exact raw byte counts.
+- **Settings Top-Bar Access**: Placed the Web Share Studio launch button directly on the Settings screen header bar for fast 1-tap access.
+
 ## v2.19.27 - UI/UX Styling Toolbar Improvements
 - **Toolbar Rearrangement**: Reorganized the markdown editor's styling toolbar into a logical, standard UX flow. Grouped text formatting together, moved structural elements (headings, blockquotes, code) together, and placed lists and dividers sequentially to match how users naturally structure documents.
 
