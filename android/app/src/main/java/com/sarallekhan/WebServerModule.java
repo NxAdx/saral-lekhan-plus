@@ -14,9 +14,13 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.io.BufferedReader;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -229,40 +233,39 @@ public class WebServerModule extends ReactContextBaseJavaModule {
     }
 
     private void handleClient(Socket socket) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
+        try (InputStream rawIn = new BufferedInputStream(socket.getInputStream(), 8192);
              OutputStream out = socket.getOutputStream()) {
-             
-            String requestLine = reader.readLine();
+
+            String requestLine = readAsciiLine(rawIn);
             if (requestLine == null || requestLine.isEmpty()) return;
 
             String[] parts = requestLine.split(" ");
             String method = parts.length > 0 ? parts[0] : "GET";
             String path = parts.length > 1 ? parts[1] : "/";
-            
+
             int contentLength = 0;
-            String line;
-            while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                if (line.toLowerCase().startsWith("content-length:")) {
-                    String val = line.substring(line.indexOf(':') + 1).trim();
+            String headerLine;
+            while ((headerLine = readAsciiLine(rawIn)) != null && !headerLine.isEmpty()) {
+                if (headerLine.toLowerCase().startsWith("content-length:")) {
+                    String val = headerLine.substring(headerLine.indexOf(':') + 1).trim();
                     try {
                         contentLength = Integer.parseInt(val);
                     } catch (NumberFormatException ignored) {}
                 }
             }
 
-            StringBuilder bodyBuilder = new StringBuilder();
+            // CRITICAL FIX: Read exact byte count from raw stream. Never use char reader with Content-Length!
+            String body = "";
             if (contentLength > 0 && contentLength < 10485760) { // Max 10MB
-                char[] buffer = new char[4096];
+                byte[] bodyBytes = new byte[contentLength];
                 int totalRead = 0;
                 while (totalRead < contentLength) {
-                    int toRead = Math.min(buffer.length, contentLength - totalRead);
-                    int read = reader.read(buffer, 0, toRead);
+                    int read = rawIn.read(bodyBytes, totalRead, contentLength - totalRead);
                     if (read == -1) break;
-                    bodyBuilder.append(buffer, 0, read);
                     totalRead += read;
                 }
+                body = new String(bodyBytes, 0, totalRead, StandardCharsets.UTF_8);
             }
-            String body = bodyBuilder.toString();
 
             String corsHeaders = "Access-Control-Allow-Origin: *\r\n" +
                                  "Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS\r\n" +
@@ -303,10 +306,15 @@ public class WebServerModule extends ReactContextBaseJavaModule {
             if ("POST".equalsIgnoreCase(method) && "/api/notes".equals(path)) {
                 final String payload = body;
                 if (!payload.isEmpty()) {
+                    // Update local in-memory notes cache immediately
+                    updateLocalCacheFromPayload(payload);
+
                     // Send event to React Native
-                    if (reactContext.hasActiveCatalystInstance()) {
+                    try {
                         reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                                 .emit("onWebShareNotesUpdated", payload);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error emitting onWebShareNotesUpdated event", e);
                     }
                 }
                 byte[] content = "{\"status\":\"success\",\"message\":\"Note action processed\"}".getBytes(StandardCharsets.UTF_8);
@@ -359,6 +367,110 @@ public class WebServerModule extends ReactContextBaseJavaModule {
             try {
                 socket.close();
             } catch (IOException ignored) {}
+        }
+    }
+
+    private static String readAsciiLine(InputStream in) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(128);
+        int b;
+        while ((b = in.read()) != -1) {
+            if (b == '\n') break;
+            if (b != '\r') baos.write(b);
+        }
+        if (baos.size() == 0 && b == -1) return null;
+        return baos.toString("ISO-8859-1");
+    }
+
+    private void updateLocalCacheFromPayload(String payload) {
+        try {
+            JSONObject obj = new JSONObject(payload);
+            String action = obj.optString("action", "");
+            if ("save".equals(action) && obj.has("note")) {
+                JSONObject newNote = obj.getJSONObject("note");
+                long noteId = newNote.optLong("id", -1);
+                if (noteId != -1) {
+                    JSONArray arr = new JSONArray(notesJsonData.get());
+                    boolean found = false;
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject item = arr.getJSONObject(i);
+                        if (item.optLong("id") == noteId) {
+                            if (newNote.has("title")) item.put("title", newNote.getString("title"));
+                            if (newNote.has("body")) item.put("body", newNote.getString("body"));
+                            if (newNote.has("tag")) item.put("tag", newNote.getString("tag"));
+                            if (newNote.has("pinned")) item.put("pinned", newNote.getBoolean("pinned"));
+                            item.put("updated_at", System.currentTimeMillis());
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        arr.put(newNote);
+                    }
+                    notesJsonData.set(arr.toString());
+                }
+            } else if ("create".equals(action) && obj.has("note")) {
+                JSONObject newNote = obj.getJSONObject("note");
+                JSONArray arr = new JSONArray(notesJsonData.get());
+                JSONArray newArr = new JSONArray();
+                newArr.put(newNote);
+                for (int i = 0; i < arr.length(); i++) {
+                    newArr.put(arr.get(i));
+                }
+                notesJsonData.set(newArr.toString());
+            } else if ("delete".equals(action)) {
+                long noteId = obj.optLong("noteId", -1);
+                if (noteId != -1) {
+                    JSONArray arr = new JSONArray(notesJsonData.get());
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject item = arr.getJSONObject(i);
+                        if (item.optLong("id") == noteId) {
+                            item.put("is_deleted", 1);
+                            item.put("updated_at", System.currentTimeMillis());
+                            break;
+                        }
+                    }
+                    notesJsonData.set(arr.toString());
+                }
+            } else if ("restore".equals(action)) {
+                long noteId = obj.optLong("noteId", -1);
+                if (noteId != -1) {
+                    JSONArray arr = new JSONArray(notesJsonData.get());
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject item = arr.getJSONObject(i);
+                        if (item.optLong("id") == noteId) {
+                            item.put("is_deleted", 0);
+                            item.put("updated_at", System.currentTimeMillis());
+                            break;
+                        }
+                    }
+                    notesJsonData.set(arr.toString());
+                }
+            } else if ("permanentlyDelete".equals(action)) {
+                long noteId = obj.optLong("noteId", -1);
+                if (noteId != -1) {
+                    JSONArray arr = new JSONArray(notesJsonData.get());
+                    JSONArray newArr = new JSONArray();
+                    for (int i = 0; i < arr.length(); i++) {
+                        JSONObject item = arr.getJSONObject(i);
+                        if (item.optLong("id") != noteId) {
+                            newArr.put(item);
+                        }
+                    }
+                    notesJsonData.set(newArr.toString());
+                }
+            } else if ("emptyTrash".equals(action)) {
+                JSONArray arr = new JSONArray(notesJsonData.get());
+                JSONArray newArr = new JSONArray();
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject item = arr.getJSONObject(i);
+                    if (item.optInt("is_deleted", 0) == 0 && !item.optBoolean("is_deleted", false)) {
+                        newArr.put(item);
+                    }
+                }
+                notesJsonData.set(newArr.toString());
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Could not update local cache from payload", e);
         }
     }
 
@@ -528,8 +640,9 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         // Editor Panel
         sb.append(".editor-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg); }\n");
         sb.append(".editor-topbar { padding: 12px 28px; border-bottom: 1px solid var(--stroke); display: flex; align-items: center; justify-content: space-between; background: var(--bg-raised); }\n");
-        sb.append(".sync-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--ink-mid); background: var(--bg-deep); padding: 5px 12px; border-radius: var(--radius-pill); border: 1px solid var(--stroke); }\n");
+        sb.append(".sync-pill { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--ink-mid); background: var(--bg-deep); padding: 5px 12px; border-radius: var(--radius-pill); border: 1px solid var(--stroke); transition: all 0.2s ease; }\n");
         sb.append(".sync-pill.saved { color: var(--success); border-color: var(--success); background: rgba(16,185,129,0.08); }\n");
+        sb.append(".sync-pill.failed { color: var(--danger); border-color: var(--danger); background: var(--danger-bg); cursor: pointer; }\n");
         sb.append(".topbar-actions { display: flex; align-items: center; gap: 8px; }\n");
 
         // Rich Styling Toolbar (with H1, H2, H3, P and Segmented Mode Switcher)
@@ -709,7 +822,15 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    const res = await fetch('/api/notes');\n");
         sb.append("    if (!res.ok) return;\n");
         sb.append("    const data = await res.json();\n");
-        sb.append("    allNotes = Array.isArray(data) ? data : [];\n");
+        sb.append("    const fetched = Array.isArray(data) ? data : [];\n");
+        sb.append("    if (isDirty && activeNoteId) {\n");
+        sb.append("      const current = allNotes.find(x => x.id === activeNoteId);\n");
+        sb.append("      if (current) {\n");
+        sb.append("        const idx = fetched.findIndex(x => x.id === activeNoteId);\n");
+        sb.append("        if (idx !== -1) fetched[idx] = Object.assign({}, fetched[idx], current);\n");
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("    allNotes = fetched;\n");
         sb.append("    updateCountsAndBadges();\n");
         sb.append("    renderTags();\n");
         sb.append("    renderList();\n");
@@ -884,7 +1005,13 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  const el = document.getElementById('syncStatus');\n");
         sb.append("  if (el) {\n");
         sb.append("    el.innerHTML = `<span>${text}</span>`;\n");
-        sb.append("    el.className = 'sync-pill' + (isSaved ? ' saved' : '');\n");
+        sb.append("    const isFailed = text.includes('failed');\n");
+        sb.append("    el.className = 'sync-pill' + (isSaved ? ' saved' : (isFailed ? ' failed' : ''));\n");
+        sb.append("    if (isFailed) {\n");
+        sb.append("      el.onclick = () => saveCurrentNote(false);\n");
+        sb.append("    } else {\n");
+        sb.append("      el.onclick = null;\n");
+        sb.append("    }\n");
         sb.append("  }\n");
         sb.append("}\n");
 
@@ -898,11 +1025,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  const noteId = isCreatingNew ? Date.now() : activeNoteId;\n");
         sb.append("  const notePayload = { id: noteId, title: title || 'Untitled', tag, body, pinned: isPinned, updated_at: Date.now() };\n");
         sb.append("  try {\n");
-        sb.append("    await fetch('/api/notes', {\n");
+        sb.append("    const res = await fetch('/api/notes', {\n");
         sb.append("      method: 'POST',\n");
         sb.append("      headers: { 'Content-Type': 'application/json' },\n");
         sb.append("      body: JSON.stringify({ action, note: notePayload })\n");
         sb.append("    });\n");
+        sb.append("    if (!res.ok) throw new Error('HTTP ' + res.status);\n");
         sb.append("    isDirty = false;\n");
         sb.append("    setSyncStatus('✓ Synced with phone', true);\n");
         sb.append("    if (!isAuto) showToast('Saved to mobile device!', 'success');\n");
@@ -917,7 +1045,11 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("    updateCountsAndBadges();\n");
         sb.append("    renderTags();\n");
         sb.append("    renderList();\n");
-        sb.append("  } catch(e) { setSyncStatus('⚠️ Sync failed', false); if(!isAuto) showToast('Error saving note', 'error'); }\n");
+        sb.append("  } catch(e) {\n");
+        sb.append("    console.error('Save note failed:', e);\n");
+        sb.append("    setSyncStatus('⚠️ Sync failed (Click to retry)', false);\n");
+        sb.append("    if(!isAuto) showToast('Error saving note: ' + (e.message || ''), 'error');\n");
+        sb.append("  }\n");
         sb.append("}\n");
 
         sb.append("async function saveNoteSilently() {\n");
@@ -932,11 +1064,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("  const note = allNotes.find(x => x.id === targetId);\n");
         sb.append("  if (note) note.is_deleted = true;\n");
         sb.append("  try {\n");
-        sb.append("    await fetch('/api/notes', {\n");
+        sb.append("    const res = await fetch('/api/notes', {\n");
         sb.append("      method: 'POST',\n");
         sb.append("      headers: { 'Content-Type': 'application/json' },\n");
         sb.append("      body: JSON.stringify({ action: 'delete', noteId: targetId })\n");
         sb.append("    });\n");
+        sb.append("    if (!res.ok) throw new Error('HTTP ' + res.status);\n");
         sb.append("    showToast('Moved note to Trash', 'success');\n");
         sb.append("    updateCountsAndBadges();\n");
         sb.append("    const nextActive = getFilteredNotes();\n");
@@ -967,11 +1100,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
 
         sb.append("async function restoreNote(id) {\n");
         sb.append("  try {\n");
-        sb.append("    await fetch('/api/notes', {\n");
+        sb.append("    const res = await fetch('/api/notes', {\n");
         sb.append("      method: 'POST',\n");
         sb.append("      headers: { 'Content-Type': 'application/json' },\n");
         sb.append("      body: JSON.stringify({ action: 'restore', noteId: id })\n");
         sb.append("    });\n");
+        sb.append("    if (!res.ok) throw new Error('HTTP ' + res.status);\n");
         sb.append("    const note = allNotes.find(x => x.id === id);\n");
         sb.append("    if (note) note.is_deleted = false;\n");
         sb.append("    showToast('Note restored!', 'success');\n");
@@ -985,11 +1119,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("async function deleteForever(id) {\n");
         sb.append("  if (!confirm('Permanently delete this note? This cannot be undone.')) return;\n");
         sb.append("  try {\n");
-        sb.append("    await fetch('/api/notes', {\n");
+        sb.append("    const res = await fetch('/api/notes', {\n");
         sb.append("      method: 'POST',\n");
         sb.append("      headers: { 'Content-Type': 'application/json' },\n");
         sb.append("      body: JSON.stringify({ action: 'permanentlyDelete', noteId: id })\n");
         sb.append("    });\n");
+        sb.append("    if (!res.ok) throw new Error('HTTP ' + res.status);\n");
         sb.append("    allNotes = allNotes.filter(x => x.id !== id);\n");
         sb.append("    showToast('Permanently deleted', 'success');\n");
         sb.append("    updateCountsAndBadges();\n");
@@ -1002,11 +1137,12 @@ public class WebServerModule extends ReactContextBaseJavaModule {
         sb.append("async function emptyTrash() {\n");
         sb.append("  if (!confirm('Permanently delete ALL notes in trash?')) return;\n");
         sb.append("  try {\n");
-        sb.append("    await fetch('/api/notes', {\n");
+        sb.append("    const res = await fetch('/api/notes', {\n");
         sb.append("      method: 'POST',\n");
         sb.append("      headers: { 'Content-Type': 'application/json' },\n");
         sb.append("      body: JSON.stringify({ action: 'emptyTrash' })\n");
         sb.append("    });\n");
+        sb.append("    if (!res.ok) throw new Error('HTTP ' + res.status);\n");
         sb.append("    allNotes = allNotes.filter(x => !x.is_deleted);\n");
         sb.append("    showToast('Trash emptied', 'success');\n");
         sb.append("    updateCountsAndBadges();\n");
