@@ -1,7 +1,10 @@
 # Changelog
 
-## v2.19.28 - Web Share Studio Real-Time Auto-Sync, Refresh & Print
-- **Note Printing & PDF Export (`🖨️ Print` & Ctrl+P)**: Added an intuitive Print button to the editor toolbar and keyboard shortcut (`Ctrl+P` / `Cmd+P`). Features dedicated ink-friendly `@media print` typography that strips editor chrome, sidebar, and toolbars, cleanly outputting note title, tags, and formatted content for printers and PDF export.
+## v2.19.29 - Web Share Studio Print & Document Export
+- **Note Printing & PDF Export (`🖨️ Print` & Ctrl+P)**: Added an intuitive Print button to the editor top action bar and keyboard shortcut (`Ctrl+P` / `Cmd+P`). Automatically switches from source to visual mode before printing so markdown renders as clean, formatted rich text.
+- **Dedicated Print Typography (`@media print`)**: Engineered clean, ink-efficient print styles that hide web chrome (sidebar, topbars, editing toolbars, trash banners, and toasts), preserve document pagination (`page-break-inside: avoid` for code and blockquotes), and render high-contrast black text on pure white paper with formatted title, tag, and body.
+
+## v2.19.28 - Web Share Studio Real-Time Auto-Sync & Manual Refresh
 - **Real-Time Auto-Sync (Live Updates)**: Web Share Studio automatically polls and synchronizes notes every 3 seconds. Edits made on the mobile phone automatically reload in the active note and refresh the sidebar list in real time without needing page reloads.
 - **Smart Non-Destructive Conflict Guard**: If a user is actively composing or typing unsaved edits in the web studio (`isDirty`), auto-sync protects their work and avoids overwriting edits. The sync status pill alerts the user with a 1-click reload option when ready.
 - **Tactile Refresh Buttons**: Added prominent, animated `🔄 Refresh` buttons to both the sidebar brand header and the editor top action bar for immediate on-demand synchronization with visual spin feedback.

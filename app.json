@@ -2,7 +2,7 @@
   "expo": {
     "name": "Saral Lekhan Plus",
     "slug": "saral-lekhan-plus",
-    "version": "2.19.28",
+    "version": "2.19.29",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
