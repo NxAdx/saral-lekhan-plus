@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ThemeName } from '../tokens';
+import { getDeviceDefaultLanguage } from '../i18n/deviceLocale';
 
 export type AppLanguage = 'En' | 'Hi' | 'Bn' | 'Te' | 'Mr' | 'Ta';
 export type NightMode = 'system' | 'light' | 'dark';
@@ -13,6 +14,7 @@ export function normalizeAppFont(_font?: string | null): AppFontType {
 
 interface SettingsState {
     language: AppLanguage;
+    hasUserChosenLanguage: boolean;
     nightMode: NightMode;
     themeId: ThemeName;
     fontSize: number;
@@ -38,7 +40,8 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
     persist(
         (set) => ({
-            language: 'Hi',
+            language: getDeviceDefaultLanguage(),
+            hasUserChosenLanguage: false,
             nightMode: 'system',
             themeId: 'classic',
             fontSize: 1.0,
@@ -49,7 +52,7 @@ export const useSettingsStore = create<SettingsState>()(
             highContrast: false,
             largeTouch: false,
 
-            setLanguage: (l) => set({ language: l }),
+            setLanguage: (l) => set({ language: l, hasUserChosenLanguage: true }),
             setNightMode: (m) => set({ nightMode: m }),
             setThemeId: (i) => {
                 // Migration: if the theme was pitch (which is being removed), reset to classic
@@ -69,9 +72,14 @@ export const useSettingsStore = create<SettingsState>()(
             storage: createJSONStorage(() => AsyncStorage),
             merge: (persistedState, currentState) => {
                 const typedState = (persistedState as Partial<SettingsState>) || {};
+                const resolvedLanguage = typedState.hasUserChosenLanguage && typedState.language
+                    ? typedState.language
+                    : (typedState.language || getDeviceDefaultLanguage());
+
                 return {
                     ...currentState,
                     ...typedState,
+                    language: resolvedLanguage,
                     appFont: normalizeAppFont(typedState.appFont),
                     ttsEnabled: typedState.ttsEnabled !== undefined ? typedState.ttsEnabled : true,
                 };
