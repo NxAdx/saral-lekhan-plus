@@ -9,9 +9,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/NxAdx/saral-lekhan-pro/releases/latest"><img src="https://img.shields.io/github/v/release/NxAdx/saral-lekhan-pro?style=flat-square&color=blue" alt="Release" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/NxAdx/saral-lekhan-pro?style=flat-square" alt="License" /></a>
-  <a href="https://github.com/NxAdx/saral-lekhan-pro/actions"><img src="https://img.shields.io/github/actions/workflow/status/NxAdx/saral-lekhan-pro/android-build.yml?style=flat-square" alt="Build" /></a>
+  <a href="https://github.com/NxAdx/saral-lekhan-plus/releases/latest"><img src="https://img.shields.io/github/v/release/NxAdx/saral-lekhan-plus?style=flat-square&color=blue" alt="Release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/NxAdx/saral-lekhan-plus?style=flat-square" alt="License" /></a>
+  <a href="https://github.com/NxAdx/saral-lekhan-plus/actions"><img src="https://img.shields.io/github/actions/workflow/status/NxAdx/saral-lekhan-plus/android-build.yml?style=flat-square" alt="Build" /></a>
 </p>
 
 ---
@@ -50,15 +50,15 @@
 
 | Source | Link |
 |--------|------|
-| GitHub Releases | [Download Latest APK](https://github.com/NxAdx/saral-lekhan-pro/releases/latest) |
+| GitHub Releases | [Download Latest APK](https://github.com/NxAdx/saral-lekhan-plus/releases/latest) |
 | F-Droid | Submission update in progress |
 
 ## Build from Source
 
 ```bash
 # Clone the repo
-git clone https://github.com/NxAdx/saral-lekhan-pro.git
-cd saral-lekhan-pro
+git clone https://github.com/NxAdx/saral-lekhan-plus.git
+cd saral-lekhan-plus
 
 # Install dependencies
 npm ci --legacy-peer-deps

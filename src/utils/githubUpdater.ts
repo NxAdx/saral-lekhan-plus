@@ -14,7 +14,7 @@ export const DISTRIBUTION_CHANNEL = String(Constants.expoConfig?.extra?.distribu
 export const UPDATER_MODE = String(Constants.expoConfig?.extra?.updaterMode || 'github');
 
 const REPO_OWNER = 'NxAdx';
-const REPO_NAME = 'saral-lekhan-pro';
+const REPO_NAME = 'saral-lekhan-plus';
 
 /**
  * Expert Numeric Versioning Logic

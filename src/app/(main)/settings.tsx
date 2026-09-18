@@ -872,7 +872,7 @@ export default function SettingsScreen() {
                             <Text style={s.listSub}>{loc.settingsScreen.foundBugSub}</Text>
                         </View>
                         <Pressable 
-                            onPress={() => Linking.openURL('https://github.com/NxAdx/saral-lekhan-pro/issues/new')}
+                            onPress={() => Linking.openURL('https://github.com/NxAdx/saral-lekhan-plus/issues/new')}
                             style={{ paddingHorizontal: 16, paddingVertical: 8, backgroundColor: colors.accentBg, borderRadius: theme.radius.sm, justifyContent: 'center' }}
                         >
                             <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: colors.accent }}>{loc.settingsScreen.reportIssue}</Text>
@@ -961,7 +961,7 @@ export default function SettingsScreen() {
                                     <View style={{ marginTop: 24, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.strokeDim }}>
                                         <Text style={{ fontFamily: font.sans, color: colors.inkMid, fontSize: 13, marginBottom: 12 }}>{loc.settingsScreen.olderChanges}</Text>
                                         <Pressable 
-                                            onPress={() => Linking.openURL('https://github.com/NxAdx/saral-lekhan-pro/releases')}
+                                            onPress={() => Linking.openURL('https://github.com/NxAdx/saral-lekhan-plus/releases')}
                                             style={{ padding: 12, backgroundColor: colors.bgRaised, borderRadius: 8, borderWidth: 1, borderColor: colors.strokeDim, alignItems: 'center' }}
                                         >
                                             <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: colors.accent }}>{loc.settingsScreen.viewFullChangelog}</Text>

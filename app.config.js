@@ -39,7 +39,7 @@ module.exports = {
       ],
     },
     extra: {
-      runtimeFlagsUrl: "https://raw.githubusercontent.com/NxAdx/saral-lekhan-pro/main/runtime-flags.json",
+      runtimeFlagsUrl: "https://raw.githubusercontent.com/NxAdx/saral-lekhan-plus/main/runtime-flags.json",
       distributionChannel: "direct",
       updaterMode: "github",
       eas: {
