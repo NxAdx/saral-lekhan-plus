@@ -7,16 +7,8 @@ export type AppLanguage = 'En' | 'Hi' | 'Bn' | 'Te' | 'Mr' | 'Ta';
 export type NightMode = 'system' | 'light' | 'dark';
 export type AppFontType = 'hind' | 'poppins' | 'notoSans' | 'baloo2';
 
-export function normalizeAppFont(font: string | undefined | null): AppFontType {
-    switch (font) {
-        case 'poppins':
-        case 'notoSans':
-        case 'baloo2':
-        case 'hind':
-            return font;
-        default:
-            return 'hind';
-    }
+export function normalizeAppFont(_font?: string | null): AppFontType {
+    return 'hind';
 }
 
 interface SettingsState {

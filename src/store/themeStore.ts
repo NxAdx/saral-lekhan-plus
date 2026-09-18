@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 import { shallow } from 'zustand/shallow';
 import { sharedTokens, themes } from '../tokens';
-import { useSettingsStore, AppFontType, normalizeAppFont } from './settingsStore';
-import { FONT_SCALES, resolveEffectiveAppFont } from '../constants/fontConfig';
+import { useSettingsStore } from './settingsStore';
 
 type ThemeValue = {
     colors: (typeof themes)[keyof typeof themes]['light'];
@@ -26,48 +25,22 @@ type ThemeValue = {
     hitSlop: number;
 };
 
-const getFontSet = (type: AppFontType) => {
-    switch (type) {
-        case 'poppins':
-            return {
-                sans: 'Poppins',
-                sansMed: 'Poppins-Medium',
-                sansSemi: 'Poppins-SemiBold',
-                sansBold: 'Poppins-Bold',
-            };
-        case 'notoSans':
-            return {
-                sans: 'NotoSans',
-                sansMed: 'NotoSans-Medium',
-                sansSemi: 'NotoSans-SemiBold',
-                sansBold: 'NotoSans-Bold',
-            };
-        case 'baloo2':
-            return {
-                sans: 'Baloo2',
-                sansMed: 'Baloo2-Medium',
-                sansSemi: 'Baloo2-SemiBold',
-                sansBold: 'Baloo2-Bold',
-            };
-        case 'hind':
-        default:
-            return {
-                sans: 'Hind',
-                sansMed: 'Hind-Medium',
-                sansSemi: 'Hind-SemiBold',
-                sansBold: 'Hind-Bold',
-            };
-    }
+const HIND_FONT_SET = {
+    sans: 'Hind',
+    sansMed: 'Hind-Medium',
+    sansSemi: 'Hind-SemiBold',
+    sansBold: 'Hind-Bold',
+    display: 'Hind-Bold',
+    mono: 'Hind-Medium',
+    branding: 'Hind-Bold',
 };
 
 export const useTheme = () => {
     const systemColorScheme = useColorScheme();
-    const { nightMode, themeId, language, appFont, fontSize, highContrast, largeTouch } = useSettingsStore(
+    const { nightMode, themeId, fontSize, highContrast, largeTouch } = useSettingsStore(
         (s) => ({
             nightMode: s.nightMode,
             themeId: s.themeId,
-            language: s.language,
-            appFont: s.appFont,
             fontSize: s.fontSize,
             highContrast: s.highContrast,
             largeTouch: s.largeTouch,
@@ -96,25 +69,12 @@ export const useTheme = () => {
         return c;
     }, [themeId, isDark, highContrast]);
 
-    const normalizedFont = normalizeAppFont(appFont);
-    const effectiveFont = resolveEffectiveAppFont(normalizedFont, language);
-    const activeFontSet = useMemo(() => getFontSet(effectiveFont), [effectiveFont]);
-    const fontScale = FONT_SCALES[effectiveFont] || 1.0;
-
-    const customFont = useMemo(() => ({
-        ...activeFontSet,
-        // Keep legacy token names but map them to the active UI family.
-        display: activeFontSet.sansBold,
-        mono: activeFontSet.sansMed,
-        branding: 'Hind-Bold',
-    }), [activeFontSet]);
-
     return useMemo<ThemeValue>(() => ({
         colors,
         ...sharedTokens,
-        font: customFont,
+        font: HIND_FONT_SET,
         isDark,
-        fontSize: (fontSize || 1.0) * fontScale,
+        fontSize: fontSize || 1.0,
         hitSlop: largeTouch ? 24 : 10,
-    }), [colors, customFont, isDark, fontSize, fontScale, largeTouch]);
+    }), [colors, isDark, fontSize, largeTouch]);
 };

@@ -12,25 +12,6 @@ import { useAuthStore } from '../store/authStore';
 import { useSettingsStore } from '../store/settingsStore';
 import { themes } from '../tokens';
 import { useFonts } from '@expo-google-fonts/hind';
-import {
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
-import {
-  NotoSans_400Regular,
-  NotoSans_500Medium,
-  NotoSans_600SemiBold,
-  NotoSans_700Bold,
-} from '@expo-google-fonts/noto-sans';
-import {
-  Baloo2_400Regular,
-  Baloo2_500Medium,
-  Baloo2_600SemiBold,
-  Baloo2_700Bold,
-} from '@expo-google-fonts/baloo-2';
-
 import { useAiStore } from '../store/aiStore';
 import { useNotesStore } from '../store/notesStore';
 import { useRuntimeUxFlagsStore } from '../store/runtimeUxFlagsStore';
@@ -82,18 +63,6 @@ export function RootLayout(props: any) {
     'Hind-Medium': require('../../assets/fonts/Hind-Medium.ttf'),
     'Hind-SemiBold': require('../../assets/fonts/Hind-SemiBold.ttf'),
     'Hind-Bold': require('../../assets/fonts/Hind-Bold.ttf'),
-    Poppins: Poppins_400Regular,
-    'Poppins-Medium': Poppins_500Medium,
-    'Poppins-SemiBold': Poppins_600SemiBold,
-    'Poppins-Bold': Poppins_700Bold,
-    NotoSans: NotoSans_400Regular,
-    'NotoSans-Medium': NotoSans_500Medium,
-    'NotoSans-SemiBold': NotoSans_600SemiBold,
-    'NotoSans-Bold': NotoSans_700Bold,
-    Baloo2: Baloo2_400Regular,
-    'Baloo2-Medium': Baloo2_500Medium,
-    'Baloo2-SemiBold': Baloo2_600SemiBold,
-    'Baloo2-Bold': Baloo2_700Bold,
   });
 
   const isDark = nightMode === 'dark' || (nightMode === 'system' && systemColor === 'dark');

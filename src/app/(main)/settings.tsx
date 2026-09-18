@@ -43,13 +43,6 @@ const PREMIUM_THEMES: { id: ThemeName; label: string }[] = [
     { id: 'mint', label: 'Mint' },
 ];
 
-const FONT_OPTIONS: { id: AppFontType; label: string }[] = [
-    { id: 'hind', label: 'Hind' },
-    { id: 'poppins', label: 'Poppins' },
-    { id: 'notoSans', label: 'Noto Sans' },
-    { id: 'baloo2', label: 'Baloo 2' },
-];
-
 const LANG_OPTIONS: { id: AppLanguage; label: string }[] = [
     { id: 'En', label: 'English' },
     { id: 'Hi', label: 'हिंदी' },
@@ -58,8 +51,6 @@ const LANG_OPTIONS: { id: AppLanguage; label: string }[] = [
     { id: 'Mr', label: 'मराठी' },
     { id: 'Ta', label: 'தமிழ்' },
 ];
-
-const FONT_SIZE_STEPS = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
 
 export default function SettingsScreen() {
     const router = useRouter();
@@ -593,20 +584,6 @@ export default function SettingsScreen() {
 
                 </View>
 
-                {/* Font Customization */}
-                <View style={s.listBlock}>
-                    <View style={s.listItem}>
-                        <View style={s.listContent}>
-                            <Text style={s.listLabel}>{loc.typography.appFont}</Text>
-                            <Text style={s.listSub}>{loc.typography.appFontDesc}</Text>
-                        </View>
-                    </View>
-                    <View style={[s.pillRow, { paddingTop: 20, paddingBottom: 24 }]}>
-                        {FONT_OPTIONS.map(f => (
-                            <TagPill key={f.id} label={f.label} active={settings.appFont === f.id} onPress={() => { Haptics.selectionAsync(); settings.setAppFont(f.id); }} />
-                        ))}
-                    </View>
-                </View>
 
                 {/* TTS Customization */}
                 <View style={s.listBlock}>

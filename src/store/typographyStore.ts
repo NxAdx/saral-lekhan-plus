@@ -2,18 +2,15 @@ import { useMemo } from 'react';
 import { shallow } from 'zustand/shallow';
 import { useSettingsStore } from '../store/settingsStore';
 import { sharedTokens } from '../tokens';
-import { FONT_SCALES, getEffectiveAppFont } from '../constants/fontConfig';
 
 export const useTypography = () => {
-    const { fontSize, appFont, language } = useSettingsStore(
-        (s) => ({ fontSize: s.fontSize, appFont: s.appFont, language: s.language }),
+    const { fontSize } = useSettingsStore(
+        (s) => ({ fontSize: s.fontSize }),
         shallow
     );
 
     const type = useMemo(() => {
-        const effectiveFont = getEffectiveAppFont(appFont, language);
-        const scale = FONT_SCALES[effectiveFont] || 1.0;
-        const baseMultiplier = fontSize * scale;
+        const baseMultiplier = fontSize || 1.0;
 
         return {
             displayLarge: {
@@ -52,7 +49,7 @@ export const useTypography = () => {
                 includeFontPadding: false,
             }
         };
-    }, [fontSize, appFont, language]);
+    }, [fontSize]);
 
     return type;
 };

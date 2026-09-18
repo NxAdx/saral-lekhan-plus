@@ -272,7 +272,7 @@ export default function HomeScreen() {
     },
     appNameWordmark: {
       color: colors.ink,
-      fontFamily: 'Poppins-Bold',
+      fontFamily: font.sansBold,
       fontSize: 28, // Reduced from 32 to fit
       lineHeight: 34,
       letterSpacing: -0.4,
@@ -280,7 +280,7 @@ export default function HomeScreen() {
     },
     appNameHindi: {
       color: colors.ink,
-      fontFamily: 'Poppins-Bold',
+      fontFamily: font.sansBold,
       fontSize: 28, // Reduced from 32 to fit
       lineHeight: 34,
       letterSpacing: -0.4,
@@ -288,7 +288,7 @@ export default function HomeScreen() {
     },
     appSub: {
       ...type.labelMedium,
-      fontFamily: 'Poppins-Medium',
+      fontFamily: font.sansMed,
       color: colors.inkDim,
       letterSpacing: 1.6,
       textTransform: 'uppercase',
@@ -296,7 +296,7 @@ export default function HomeScreen() {
     },
     selectionTitle: {
       ...type.headlineLarge,
-      fontFamily: 'Poppins-Bold',
+      fontFamily: font.sansBold,
       color: colors.ink,
       fontSize: 24,
       lineHeight: 30,
