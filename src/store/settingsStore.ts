@@ -27,6 +27,7 @@ interface SettingsState {
     appFont: AppFontType;
     autoSave: boolean;
     ttsLanguage: string;
+    ttsEnabled: boolean;
     highContrast: boolean;
     largeTouch: boolean;
 
@@ -37,6 +38,7 @@ interface SettingsState {
     setAppFont: (f: AppFontType) => void;
     setAutoSave: (b: boolean) => void;
     setTtsLanguage: (l: string) => void;
+    setTtsEnabled: (b: boolean) => void;
     setHighContrast: (b: boolean) => void;
     setLargeTouch: (b: boolean) => void;
 }
@@ -51,6 +53,7 @@ export const useSettingsStore = create<SettingsState>()(
             appFont: 'hind',
             autoSave: true,
             ttsLanguage: 'auto',
+            ttsEnabled: true,
             highContrast: false,
             largeTouch: false,
 
@@ -65,6 +68,7 @@ export const useSettingsStore = create<SettingsState>()(
             setAppFont: (f) => set({ appFont: normalizeAppFont(f) }),
             setAutoSave: (b) => set({ autoSave: b }),
             setTtsLanguage: (l) => set({ ttsLanguage: l }),
+            setTtsEnabled: (b) => set({ ttsEnabled: b }),
             setHighContrast: (b) => set({ highContrast: b }),
             setLargeTouch: (b) => set({ largeTouch: b }),
         }),
@@ -77,6 +81,7 @@ export const useSettingsStore = create<SettingsState>()(
                     ...currentState,
                     ...typedState,
                     appFont: normalizeAppFont(typedState.appFont),
+                    ttsEnabled: typedState.ttsEnabled !== undefined ? typedState.ttsEnabled : true,
                 };
             },
         }

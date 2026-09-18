@@ -869,25 +869,27 @@ export default function NewNoteScreen() {
 
           <View style={s.bottomBar}>
             <Text style={s.bottomBarText}>{bodyText.trim().length} {loc.editor.chars} | {wc} {loc.editor.words}</Text>
-            <Pressable onPress={toggleSpeech} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: isSpeaking ? colors.accentBg : 'transparent' }} hitSlop={8}>
-              <Svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke={isSpeaking ? colors.accent : colors.inkDim} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
-                {isSpeaking ? (
-                  <>
-                    <Rect x="6" y="4" width="4" height="16" />
-                    <Rect x="14" y="4" width="4" height="16" />
-                  </>
-                ) : (
-                  <>
-                    <Path d="M15 8a5 5 0 0 1 0 8" />
-                    <Path d="M17.7 5a9 9 0 0 1 0 14" />
-                    <Path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
-                  </>
-                )}
-              </Svg>
-              <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim, includeFontPadding: false }}>
-                {isSpeaking ? 'Stop' : 'Listen'}
-              </Text>
-            </Pressable>
+            {settings.ttsEnabled && (
+              <Pressable onPress={toggleSpeech} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, backgroundColor: isSpeaking ? colors.accentBg : 'transparent' }} hitSlop={theme.hitSlop}>
+                <Svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke={isSpeaking ? colors.accent : colors.inkDim} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+                  {isSpeaking ? (
+                    <>
+                      <Rect x="6" y="4" width="4" height="16" />
+                      <Rect x="14" y="4" width="4" height="16" />
+                    </>
+                  ) : (
+                    <>
+                      <Path d="M15 8a5 5 0 0 1 0 8" />
+                      <Path d="M17.7 5a9 9 0 0 1 0 14" />
+                      <Path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5" />
+                    </>
+                  )}
+                </Svg>
+                <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim, includeFontPadding: false }}>
+                  {isSpeaking ? 'Stop' : 'Listen'}
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
         </KeyboardAvoidingView>

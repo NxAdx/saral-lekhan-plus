@@ -96,6 +96,8 @@
         "light": "Light",
         "dark": "Dark",
         "autoSaveSub": "Automatically save notes as you type",
+        "ttsTitle": "Text-to-Speech",
+        "ttsDesc": "Enable reading notes aloud in the editor.",
         "securityPrivacy": "Security & Privacy",
         "cloudIntelligence": "Cloud & Intelligence",
         "save": "Save",

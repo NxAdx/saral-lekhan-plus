@@ -41,6 +41,7 @@ ios/.symlinks/
 .maestro/
 .gradle-home/
 research_inspiration/
+research/
 runtime-flags.json
 skills-lock.json
 

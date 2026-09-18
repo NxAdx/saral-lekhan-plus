@@ -466,7 +466,7 @@ export default function HomeScreen() {
       {/* Selection action bar */}
       {isSelectionMode && selectedIds.size > 0 && (
         <View style={s.selectionActions}>
-          <Pressable onPress={handleBulkDelete} style={s.deleteBtn} hitSlop={8} accessibilityLabel={`Delete ${selectedIds.size} notes`}>
+          <Pressable onPress={handleBulkDelete} style={s.deleteBtn} hitSlop={theme.hitSlop} accessibilityLabel={`Delete ${selectedIds.size} notes`}>
             <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.accent} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M4 7l16 0" />
               <Path d="M10 11l0 6" />
@@ -476,7 +476,7 @@ export default function HomeScreen() {
             </Svg>
             <Text style={s.deleteBtnLabel}>{loc.editor.delete || 'Delete'} ({selectedIds.size})</Text>
           </Pressable>
-          <Pressable onPress={handleBulkExport} style={s.exportBtn} hitSlop={8} accessibilityLabel="Export selected notes">
+          <Pressable onPress={handleBulkExport} style={s.exportBtn} hitSlop={theme.hitSlop} accessibilityLabel="Export selected notes">
             <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.inkMid} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
               <Path d="M7 11l5 5l5 -5" />
@@ -504,7 +504,7 @@ export default function HomeScreen() {
           testID="search-input"
         />
         {searchQuery.length > 0 && (
-          <Pressable onPress={() => setSearchQuery('')} hitSlop={10} accessibilityLabel="Clear search">
+          <Pressable onPress={() => setSearchQuery('')} hitSlop={theme.hitSlop} accessibilityLabel="Clear search">
             <Svg viewBox="0 0 24 24" width={16} height={16} fill="none" stroke={colors.inkDim} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
               <Path d="M18 6l-12 12" />
               <Path d="M6 6l12 12" />

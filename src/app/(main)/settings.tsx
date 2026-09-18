@@ -59,17 +59,6 @@ const LANG_OPTIONS: { id: AppLanguage; label: string }[] = [
     { id: 'Ta', label: 'தமிழ்' },
 ];
 
-const TTS_OPTIONS: { id: string; label: string }[] = [
-    { id: 'auto', label: 'Auto (Smart)' },
-    { id: 'system', label: 'System Default' },
-    { id: 'en-US', label: 'English (US)' },
-    { id: 'hi-IN', label: 'Hindi (India)' },
-    { id: 'bn-IN', label: 'Bengali (India)' },
-    { id: 'te-IN', label: 'Telugu (India)' },
-    { id: 'mr-IN', label: 'Marathi (India)' },
-    { id: 'ta-IN', label: 'Tamil (India)' },
-];
-
 const FONT_SIZE_STEPS = [0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4];
 
 export default function SettingsScreen() {
@@ -330,19 +319,6 @@ export default function SettingsScreen() {
             overflow: 'hidden',
             marginBottom: 16,
         },
-        singleRowCard: {
-            backgroundColor: colors.bgRaised,
-            borderRadius: theme.radius.lg,
-            borderWidth: 1,
-            borderColor: colors.stroke,
-            overflow: 'hidden',
-            elevation: 0,
-            shadowColor: 'transparent',
-            shadowOpacity: 0,
-            shadowRadius: 0,
-            shadowOffset: { width: 0, height: 0 },
-            marginBottom: 16,
-        },
         listItem: {
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -393,7 +369,7 @@ export default function SettingsScreen() {
             <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} translucent={false} />
 
             <View style={s.header}>
-                <Pressable onPress={() => router.back()} style={s.backBtn} hitSlop={10} accessibilityLabel="Back">
+                <Pressable onPress={() => router.back()} style={s.backBtn} hitSlop={theme.hitSlop} accessibilityLabel="Back">
                     <Svg viewBox="0 0 24 24" width={24} height={24} fill="none" stroke={colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
                         <Path d="M5 12l14 0" />
                         <Path d="M5 12l6 6" />
@@ -410,6 +386,7 @@ export default function SettingsScreen() {
                             setShowWebShareModal(true);
                         }}
                         accessibilityLabel="WiFi Web Share Studio"
+                        hitSlop={theme.hitSlop}
                         style={({ pressed }) => ({
                             width: 38, height: 38, borderRadius: 99,
                             borderWidth: 1.5, borderColor: colors.strokeDim,
@@ -429,6 +406,8 @@ export default function SettingsScreen() {
 
                     <Pressable
                         onPress={handleBugReport}
+                        accessibilityLabel="Report Bug"
+                        hitSlop={theme.hitSlop}
                         style={({ pressed }) => ({
                             width: 38, height: 38, borderRadius: 99,
                             borderWidth: 1.5, borderColor: colors.strokeDim,
@@ -453,6 +432,8 @@ export default function SettingsScreen() {
 
                     <Pressable
                         onPress={() => setShowFeatures(true)}
+                        accessibilityLabel="Explore Features"
+                        hitSlop={theme.hitSlop}
                         style={({ pressed }) => ({
                             width: 38, height: 38, borderRadius: 99,
                             borderWidth: 1.5, borderColor: colors.strokeDim,
@@ -594,7 +575,7 @@ export default function SettingsScreen() {
                     </View>
 
                     {/* Large Touch Toggle */}
-                    <View style={s.listItem}>
+                    <View style={[s.listItem, s.listItemNoBorder]}>
                         <View style={s.listContent}>
                             <Text style={s.listLabel}>Large Touch Targets</Text>
                             <Text style={s.listSub}>Increases the tappable area of buttons for easier navigation.</Text>
@@ -629,17 +610,21 @@ export default function SettingsScreen() {
 
                 {/* TTS Customization */}
                 <View style={s.listBlock}>
-                    <View style={s.listItem}>
+                    <View style={[s.listItem, s.listItemNoBorder]}>
                         <View style={s.listContent}>
-                            <Text style={s.listLabel}>Text-to-Speech Voice</Text>
-                            <Text style={s.listSub}>Choose the voice language used when reading your notes. 'Auto' will dynamically switch based on the note's text.</Text>
+                            <Text style={s.listLabel}>{loc.settingsScreen?.ttsTitle || "Text-to-Speech"}</Text>
+                            <Text style={s.listSub}>{loc.settingsScreen?.ttsDesc || "Enable reading notes aloud in the editor."}</Text>
                         </View>
+                        <Switch
+                            value={settings.ttsEnabled}
+                            onValueChange={(v) => {
+                                Haptics.selectionAsync();
+                                settings.setTtsEnabled(v);
+                            }}
+                            trackColor={{ false: colors.stroke, true: colors.accent }}
+                            thumbColor={colors.white}
+                        />
                     </View>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[s.pillRow, { paddingTop: 20, paddingBottom: 24, flexWrap: 'nowrap' }]}>
-                        {TTS_OPTIONS.map(opt => (
-                            <TagPill key={opt.id} label={opt.label} active={settings.ttsLanguage === opt.id} onPress={() => { Haptics.selectionAsync(); settings.setTtsLanguage(opt.id); }} />
-                        ))}
-                    </ScrollView>
                 </View>
 
                 {/* THEME PALETTES */}
@@ -727,7 +712,7 @@ export default function SettingsScreen() {
 
                 {/* SECURITY & PRIVACY */}
                 <Text style={s.sectionTitle}>{loc.settingsScreen.securityPrivacy}</Text>
-                <View style={s.singleRowCard}>
+                <View style={s.listBlock}>
                     <View style={[s.listItem, s.listItemNoBorder]}>
                         <View style={s.listContent}>
                             <Text style={s.listLabel}>{loc.plusFeatures.biometricTitle}</Text>
