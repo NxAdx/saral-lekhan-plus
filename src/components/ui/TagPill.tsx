@@ -35,7 +35,7 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
         },
         animStyle
       ]}
-      hitSlop={hitSlop}
+      hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
     >
       {icon}
       <Text

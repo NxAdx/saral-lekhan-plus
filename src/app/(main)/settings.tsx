@@ -10,9 +10,9 @@ import { useSyncStore } from '../../store/syncStore';
 import { useNotesStore } from '../../store/notesStore';
 import { themes, ThemeName } from '../../tokens';
 import { strings } from '../../i18n/strings';
-import { TagPill } from '../../components/ui/TagPill';
 import { AppFontType } from '../../store/settingsStore';
 import { ThemedModal } from '../../components/ui/ThemedModal';
+import { LanguageSelectorModal, SUPPORTED_LANGUAGES } from '../../components/ui/LanguageSelectorModal';
 import { useTypography } from '../../store/typographyStore';
 import { APP_CHANGELOG } from '../../constants/changelog';
 import { log } from '../../utils/Logger';
@@ -43,15 +43,6 @@ const PREMIUM_THEMES: { id: ThemeName; label: string }[] = [
     { id: 'mint', label: 'Mint' },
 ];
 
-const LANG_OPTIONS: { id: AppLanguage; label: string }[] = [
-    { id: 'En', label: 'English' },
-    { id: 'Hi', label: 'हिंदी' },
-    { id: 'Bn', label: 'বাংলা' },
-    { id: 'Te', label: 'తెలుగు' },
-    { id: 'Mr', label: 'मराठी' },
-    { id: 'Ta', label: 'தமிழ்' },
-];
-
 export default function SettingsScreen() {
     const router = useRouter();
     const theme = useTheme();
@@ -68,10 +59,15 @@ export default function SettingsScreen() {
 
     const [showFeatures, setShowFeatures] = React.useState(false);
     const [showChangelog, setShowChangelog] = React.useState(false);
+    const [showLanguageModal, setShowLanguageModal] = React.useState(false);
     const [tempKey, setTempKey] = React.useState('');
     const [syncAlert, setSyncAlert] = React.useState<{ visible: boolean, title: string, sub: string }>({ visible: false, title: '', sub: '' });
     const [updateModal, setUpdateModal] = React.useState<{ visible: boolean, title: string, sub: string, info: UpdateInfo | null }>({ visible: false, title: '', sub: '', info: null });
     const [showWebShareModal, setShowWebShareModal] = React.useState(false);
+
+    const currentLangOption = useMemo(() => {
+        return SUPPORTED_LANGUAGES.find(l => l.id === settings.language) || SUPPORTED_LANGUAGES[0];
+    }, [settings.language]);
 
     // Updater State
     const [updateInfo, setUpdateInfo] = React.useState<UpdateInfo | null>(null);
@@ -704,51 +700,40 @@ export default function SettingsScreen() {
 
                 {/* LANGUAGE SECTION */}
                 <Text style={s.sectionTitle}>{loc.settingsScreen.displayLanguage}</Text>
-                <View style={[s.listBlock, { paddingBottom: 16 }]}>
-                    <View style={[s.pillRow, { paddingTop: 16 }]}>
-                        {LANG_OPTIONS.map(l => (
-                            <TagPill key={l.id} label={l.label} active={settings.language === l.id} onPress={() => settings.setLanguage(l.id)} />
-                        ))}
-                    </View>
-                    {Platform.OS === 'android' && (Platform.Version as number) >= 33 && (
-                        <Pressable
-                            onPress={async () => {
-                                try {
-                                    const IntentLauncher = await import('expo-intent-launcher');
-                                    await IntentLauncher.startActivityAsync('android.settings.APP_LOCALE_SETTINGS', {
-                                        data: 'package:com.sarallekhan'
-                                    });
-                                } catch (_e) {
-                                    // Fallback handled in-app
-                                }
-                            }}
-                            style={{
-                                marginTop: 8,
-                                marginHorizontal: 16,
-                                paddingVertical: 10,
-                                paddingHorizontal: 14,
-                                borderRadius: theme.radius.md,
-                                borderWidth: 1,
-                                borderColor: colors.strokeDim,
-                                backgroundColor: colors.bg,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: 8,
-                            }}
-                        >
-                            <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={colors.inkMid} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
-                                <Path d="M4 5h7" />
-                                <Path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
-                                <Path d="M5 9c0 2.144 2.952 3.908 6.7 4" />
-                                <Path d="M12 20l4 -9l4 9" />
-                                <Path d="M19.1 18h-6.2" />
+                <View style={s.listBlock}>
+                    <Pressable
+                        style={[s.listItem, s.listItemNoBorder]}
+                        onPress={() => {
+                            Haptics.selectionAsync();
+                            setShowLanguageModal(true);
+                        }}
+                    >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 }}>
+                            <View style={{ width: 38, height: 38, borderRadius: theme.radius.sm, backgroundColor: colors.accentBg, justifyContent: 'center', alignItems: 'center' }}>
+                                <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={colors.accent} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+                                    <Path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
+                                    <Path d="M3.6 9h16.8" />
+                                    <Path d="M3.6 15h16.8" />
+                                    <Path d="M11.5 3a17 17 0 0 0 0 18" />
+                                    <Path d="M12.5 3a17 17 0 0 1 0 18" />
+                                </Svg>
+                            </View>
+                            <View style={s.listContent}>
+                                <Text style={s.listLabel}>{loc.settingsScreen.displayLanguage}</Text>
+                                <Text style={s.listSub}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <View style={{ paddingHorizontal: 12, paddingVertical: 4, backgroundColor: colors.bg, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: colors.strokeDim }}>
+                                <Text style={{ fontFamily: font.sansBold, fontSize: 13, color: colors.accent }}>
+                                    {currentLangOption.nativeName}
+                                </Text>
+                            </View>
+                            <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={colors.inkDim} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                <Path d="M9 6l6 6l-6 6" />
                             </Svg>
-                            <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: colors.inkMid }}>
-                                {loc.settingsScreen?.systemLocaleBtn || "System Language Settings"}
-                            </Text>
-                        </Pressable>
-                    )}
+                        </View>
+                    </Pressable>
                 </View>
 
                 {/* SECURITY & PRIVACY */}
@@ -1023,6 +1008,12 @@ export default function SettingsScreen() {
                 visible={showWebShareModal}
                 onClose={() => setShowWebShareModal(false)}
                 onShowToast={(msg) => setSyncAlert({ visible: true, title: "Web Share Studio", sub: msg })}
+            />
+            <LanguageSelectorModal
+                visible={showLanguageModal}
+                currentLanguage={settings.language}
+                onSelectLanguage={(lang) => settings.setLanguage(lang)}
+                onClose={() => setShowLanguageModal(false)}
             />
         </View>
     );

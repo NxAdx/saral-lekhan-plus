@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AppState, useColorScheme, View, StyleSheet, I18nManager } from 'react-native';
+import { AppState, useColorScheme, View, StyleSheet, I18nManager, Text, TextInput } from 'react-native';
 
 try {
   if (I18nManager.isRTL) {
@@ -7,6 +7,19 @@ try {
     I18nManager.forceRTL(false);
   }
 } catch (_e) {}
+
+// Standardize on 1.0x font scaling across all scripts to eliminate layout jumps
+if ((Text as any).defaultProps == null) {
+  (Text as any).defaultProps = {};
+}
+(Text as any).defaultProps.maxFontSizeMultiplier = 1.0;
+(Text as any).defaultProps.allowFontScaling = false;
+
+if ((TextInput as any).defaultProps == null) {
+  (TextInput as any).defaultProps = {};
+}
+(TextInput as any).defaultProps.maxFontSizeMultiplier = 1.0;
+(TextInput as any).defaultProps.allowFontScaling = false;
 
 import { Stack, useRootNavigationState } from 'expo-router';
 import { ThemeProvider, DefaultTheme, DarkTheme } from '@react-navigation/native';
