@@ -6,10 +6,10 @@
  */
 
 interface EditorCssParams {
-  fontSans: string;
-  fontSansBold: string;
-  fontSansSemi: string;
-  fontMono: string;
+  fontSans?: string;
+  fontSansBold?: string;
+  fontSansSemi?: string;
+  fontMono?: string;
   fontSize: number;
   colorBg: string;
   colorBgRaised: string;
@@ -22,7 +22,10 @@ interface EditorCssParams {
 
 export function buildEditorCss(params: EditorCssParams): string {
   const {
-    fontSans, fontSansBold, fontSansSemi, fontMono,
+    fontSans = 'sans-serif',
+    fontSansBold = 'sans-serif',
+    fontSansSemi = 'sans-serif',
+    fontMono = 'monospace',
     fontSize, colorBg, colorBgRaised, colorInk, colorInkMid,
     colorInkDim, colorAccent, colorStroke,
   } = params;

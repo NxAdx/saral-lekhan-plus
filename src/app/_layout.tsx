@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { AppState, useColorScheme, View, StyleSheet } from 'react-native';
+import { AppState, useColorScheme, View, StyleSheet, I18nManager } from 'react-native';
+
+try {
+  if (I18nManager.isRTL) {
+    I18nManager.allowRTL(false);
+    I18nManager.forceRTL(false);
+  }
+} catch (_e) {}
 
 import { Stack, useRootNavigationState } from 'expo-router';
 import { ThemeProvider, DefaultTheme, DarkTheme } from '@react-navigation/native';
@@ -63,6 +70,8 @@ export function RootLayout(props: any) {
     'Hind-Medium': require('../../assets/fonts/Hind-Medium.ttf'),
     'Hind-SemiBold': require('../../assets/fonts/Hind-SemiBold.ttf'),
     'Hind-Bold': require('../../assets/fonts/Hind-Bold.ttf'),
+    'VesperLibre-Black': require('../../assets/fonts/VesperLibre-Black.ttf'),
+    'DMMono-Regular': require('../../assets/fonts/DMMono-Regular.ttf'),
   });
 
   const isDark = nightMode === 'dark' || (nightMode === 'system' && systemColor === 'dark');

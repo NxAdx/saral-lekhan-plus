@@ -37,7 +37,6 @@ export const BentoCard = React.memo(({
     const s = useMemo(() => StyleSheet.create({
         card: {
             marginVertical: 6,
-            overflow: 'hidden',
             backgroundColor: selected ? colors.accentBg : colors.bgRaised,
             borderColor: selected ? colors.accent : (pinned ? colors.accent : colors.strokeDim),
             borderWidth: 1.5,
@@ -55,13 +54,13 @@ export const BentoCard = React.memo(({
             fontFamily: font.sansBold,
             color: (selected || pinned) ? colors.accent : colors.ink,
             marginBottom: 4,
-            letterSpacing: -0.2,
+            lineHeight: Math.round(type.titleLarge.fontSize * 1.38),
         },
         preview: {
             ...type.bodyLarge,
             fontFamily: font.sans,
             color: colors.inkMid,
-            lineHeight: type.bodyLarge.fontSize * 1.4,
+            lineHeight: Math.round(type.bodyLarge.fontSize * 1.45),
             opacity: 0.85,
         },
         metaRow: {
@@ -78,19 +77,19 @@ export const BentoCard = React.memo(({
         tagChip: {
             borderWidth: 1,
             paddingVertical: 4,
-            paddingHorizontal: 8,
+            paddingHorizontal: 10,
             backgroundColor: colors.accentBg,
             borderColor: colors.accentDim,
             borderRadius: radius.md,
+            justifyContent: 'center',
+            alignItems: 'center',
         },
         tagText: {
             ...type.labelMedium,
             fontFamily: font.sansBold,
             color: colors.accent,
-            fontSize: type.labelMedium.fontSize * 0.85,
-            textTransform: 'uppercase',
-            letterSpacing: 0.5,
-            includeFontPadding: false,
+            fontSize: Math.round(type.labelMedium.fontSize * 0.88),
+            lineHeight: Math.round(type.labelMedium.fontSize * 1.35),
         },
         selectionIcon: {
             position: 'absolute',
@@ -147,7 +146,7 @@ export const BentoCard = React.memo(({
                 <View style={s.unselectedIcon} />
             ) : null}
             <View style={s.content}>
-                <Text style={s.title} numberOfLines={1}>
+                <Text style={s.title} numberOfLines={1} ellipsizeMode="tail" maxFontSizeMultiplier={1.2}>
                     {pinned ? (
                         <Svg viewBox="0 0 24 24" width={14} height={14} fill={colors.accent} stroke={colors.accent} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                             <Path d="M15 4.5l-4 4l-4 1.5l-1.5 1.5l7 7l1.5 -1.5l1.5 -4l4 -4" />
@@ -160,7 +159,7 @@ export const BentoCard = React.memo(({
                 </Text>
 
                 {cleanPreview ? (
-                    <Text style={s.preview} numberOfLines={2}>
+                    <Text style={s.preview} numberOfLines={2} ellipsizeMode="tail" maxFontSizeMultiplier={1.2}>
                         {cleanPreview}
                     </Text>
                 ) : null}

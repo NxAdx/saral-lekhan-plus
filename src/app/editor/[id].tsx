@@ -590,13 +590,30 @@ export default function EditNoteScreen() {
       ...shadow.gentle, shadowColor: colors.shadow
     },
     circleBtnActive: { backgroundColor: colors.accent, borderColor: colors.accentDark },
-    headerMid: { flex: 1, alignItems: 'center' },
+    headerMid: { flex: 1, alignItems: 'center', overflow: 'hidden', paddingHorizontal: 4 },
     headerDate: { fontFamily: font.mono, fontSize: 11 * theme.fontSize, color: colors.inkDim },
     savedBadge: { fontFamily: font.mono, fontSize: 9 * theme.fontSize, color: colors.accent, marginTop: 2 },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    doneBtn: { backgroundColor: colors.accent, paddingVertical: 8, paddingHorizontal: 14, borderRadius: radius.pill, ...shadow.gentle, shadowColor: colors.accentDark },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 },
+    doneBtn: {
+      backgroundColor: colors.accent,
+      paddingVertical: 7,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      flexShrink: 0,
+      maxWidth: 90,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...shadow.gentle,
+      shadowColor: colors.accentDark,
+    },
     doneBtnActive: { transform: [{ translateY: 2 }], shadowOffset: { width: 0, height: 1 }, elevation: 1 },
-    doneBtnText: { fontFamily: font.sansSemi, fontSize: 13, color: colors.white },
+    doneBtnText: {
+      fontFamily: font.sansSemi,
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.white,
+      textAlign: 'center',
+    },
     exportBtnText: { color: colors.white }, // High contrast for share/export
 
     editorFrame: { flex: 1 },
@@ -752,7 +769,15 @@ export default function EditNoteScreen() {
             </Svg>
           </Pressable>
           <Pressable onPress={handleDone} style={({ pressed }) => [s.doneBtn, pressed && s.doneBtnActive]} hitSlop={theme.hitSlop} testID="editor-done-button">
-            <Text style={s.doneBtnText}>{loc.editor.done}</Text>
+            <Text
+              style={s.doneBtnText}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.75}
+              maxFontSizeMultiplier={1.2}
+            >
+              {loc.editor.done}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -914,7 +939,7 @@ export default function EditNoteScreen() {
               <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6z" />
               </Svg>
-              <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim, includeFontPadding: false }}>Spark AI</Text>
+              <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim }}>Spark AI</Text>
             </Pressable>
 
             <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
@@ -1035,7 +1060,7 @@ export default function EditNoteScreen() {
                       </>
                     )}
                   </Svg>
-                  <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim, includeFontPadding: false }}>
+                  <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim }}>
                     {isSpeaking ? 'Stop' : 'Listen'}
                   </Text>
                 </Pressable>

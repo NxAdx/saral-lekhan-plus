@@ -296,7 +296,7 @@ export default function SettingsScreen() {
         title: { fontFamily: font.sansBold, fontSize: 22, color: colors.ink },
         content: { padding: 20, paddingBottom: 100 },
 
-        sectionTitle: { fontFamily: font.sansBold, fontSize: 13 * theme.fontSize, color: colors.accent, textTransform: 'uppercase', marginBottom: 12, marginTop: 24, letterSpacing: 1 },
+        sectionTitle: { fontFamily: font.sansBold, fontSize: 13 * theme.fontSize, color: colors.accent, textTransform: settings.language !== 'En' ? 'none' : 'uppercase', marginBottom: 12, marginTop: 24, letterSpacing: settings.language !== 'En' ? 0 : 0.8 },
 
         // Live Preview
         previewBox: { marginBottom: 10 },
@@ -319,8 +319,21 @@ export default function SettingsScreen() {
             borderBottomColor: colors.strokeDim,
         },
         listItemNoBorder: { borderBottomWidth: 0 },
-        listLabel: { ...type.titleLarge, fontSize: type.titleLarge.fontSize - 2, fontFamily: font.sansBold, color: colors.ink, marginBottom: 2 },
-        listSub: { ...type.labelMedium, fontFamily: font.sans, color: colors.inkMid },
+        listLabel: {
+            fontFamily: font.sansBold,
+            fontSize: type.titleLarge.fontSize - 2,
+            lineHeight: Math.round((type.titleLarge.fontSize - 2) * 1.35),
+            color: colors.ink,
+            marginBottom: 2,
+            flexShrink: 1,
+        },
+        listSub: {
+            ...type.labelMedium,
+            fontFamily: font.sans,
+            lineHeight: Math.round(type.labelMedium.fontSize * 1.38),
+            color: colors.inkMid,
+            flexShrink: 1,
+        },
         listContent: { flex: 1, marginRight: 12 },
 
         // Control buttons
@@ -330,7 +343,13 @@ export default function SettingsScreen() {
         },
         modeBtnLast: { borderRightWidth: 0 },
         activeMode: { backgroundColor: colors.accent },
-        modeText: { fontFamily: font.sansSemi, fontSize: 13 * theme.fontSize },
+        modeText: {
+            fontFamily: font.sansSemi,
+            fontSize: 13 * theme.fontSize,
+            lineHeight: 18,
+            textAlign: 'center',
+            paddingHorizontal: 2,
+        },
 
         pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, padding: 16 },
 
@@ -353,7 +372,7 @@ export default function SettingsScreen() {
         themeLineShort: { height: 4, borderRadius: 2, width: '50%', marginBottom: 12 },
         themeLabel: { fontFamily: font.sans, fontSize: 11 * theme.fontSize, textAlign: 'center' },
         listDivider: { height: 1, backgroundColor: colors.strokeDim, marginLeft: 16 },
-    }), [colors, font, theme.radius, theme.isDark, settings.nightMode, settings.themeId]);
+    }), [colors, font, theme.radius, theme.isDark, settings.nightMode, settings.themeId, settings.language, type]);
 
     return (
         <View style={s.root}>
@@ -456,8 +475,8 @@ export default function SettingsScreen() {
                         borderColor: colors.strokeDim
                     }}
                 >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+                        <View style={{ flex: 1, minWidth: 140 }}>
                             <Text style={s.listLabel}>{loc.settingsScreen.appVersion}</Text>
                             <Text style={s.listSub}>
                                 {loc.settingsScreen.currentVersion}: v{APP_VERSION}
@@ -474,7 +493,7 @@ export default function SettingsScreen() {
                             <Pressable
                                 onPress={handleDownloadUpdate}
                                 disabled={isDownloadingUpdate}
-                                style={{ backgroundColor: colors.accent, minWidth: 160, paddingHorizontal: 16, paddingVertical: 8, borderRadius: theme.radius.sm, alignItems: 'center' }}
+                                style={{ backgroundColor: colors.accent, minWidth: 130, paddingHorizontal: 16, paddingVertical: 8, borderRadius: theme.radius.sm, alignItems: 'center' }}
                             >
                                 <Text style={{ color: colors.white, fontFamily: font.sansBold, fontVariant: ['tabular-nums'] }}>
                                     {isDownloadingUpdate
@@ -489,7 +508,7 @@ export default function SettingsScreen() {
                                     backgroundColor: colors.bgRaised,
                                     borderWidth: 1,
                                     borderColor: colors.strokeDim,
-                                    paddingHorizontal: 16,
+                                    paddingHorizontal: 14,
                                     paddingVertical: 8,
                                     borderRadius: theme.radius.sm
                                 }}
@@ -524,7 +543,13 @@ export default function SettingsScreen() {
                                     settings.nightMode === m && s.activeMode
                                 ]}
                             >
-                                <Text style={[s.modeText, { color: settings.nightMode === m ? (theme.isDark ? colors.bg : colors.white) : colors.inkMid, includeFontPadding: false }]}>
+                                <Text
+                                    numberOfLines={1}
+                                    adjustsFontSizeToFit={true}
+                                    minimumFontScale={0.75}
+                                    maxFontSizeMultiplier={1.2}
+                                    style={[s.modeText, { color: settings.nightMode === m ? (theme.isDark ? colors.bg : colors.white) : colors.inkMid }]}
+                                >
                                     {m === 'system' ? loc.settingsScreen.system : m === 'light' ? loc.settingsScreen.light : loc.settingsScreen.dark}
                                 </Text>
                             </Pressable>
@@ -633,7 +658,7 @@ export default function SettingsScreen() {
                                     <View style={[s.themeLineLong, { backgroundColor: previewColors.strokeDim }]} />
                                     <View style={[s.themeLineShort, { backgroundColor: previewColors.strokeDim }]} />
                                 </View>
-                                <Text style={[s.themeLabel, { color: isSelected ? colors.accent : colors.inkMid, includeFontPadding: false }]} numberOfLines={2}>
+                                <Text style={[s.themeLabel, { color: isSelected ? colors.accent : colors.inkMid }]} numberOfLines={2}>
                                     {opt.label}
                                 </Text>
                             </Pressable>
@@ -669,7 +694,7 @@ export default function SettingsScreen() {
                                     <View style={[s.themeLineLong, { backgroundColor: previewColors.strokeDim }]} />
                                     <View style={[s.themeLineShort, { backgroundColor: previewColors.strokeDim }]} />
                                 </View>
-                                <Text style={[s.themeLabel, { color: isSelected ? colors.accent : colors.inkMid, includeFontPadding: false }]} numberOfLines={2}>
+                                <Text style={[s.themeLabel, { color: isSelected ? colors.accent : colors.inkMid }]} numberOfLines={2}>
                                     {opt.label}
                                 </Text>
                             </Pressable>
@@ -685,6 +710,45 @@ export default function SettingsScreen() {
                             <TagPill key={l.id} label={l.label} active={settings.language === l.id} onPress={() => settings.setLanguage(l.id)} />
                         ))}
                     </View>
+                    {Platform.OS === 'android' && (Platform.Version as number) >= 33 && (
+                        <Pressable
+                            onPress={async () => {
+                                try {
+                                    const IntentLauncher = await import('expo-intent-launcher');
+                                    await IntentLauncher.startActivityAsync('android.settings.APP_LOCALE_SETTINGS', {
+                                        data: 'package:com.sarallekhan'
+                                    });
+                                } catch (_e) {
+                                    // Fallback handled in-app
+                                }
+                            }}
+                            style={{
+                                marginTop: 8,
+                                marginHorizontal: 16,
+                                paddingVertical: 10,
+                                paddingHorizontal: 14,
+                                borderRadius: theme.radius.md,
+                                borderWidth: 1,
+                                borderColor: colors.strokeDim,
+                                backgroundColor: colors.bg,
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: 8,
+                            }}
+                        >
+                            <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={colors.inkMid} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+                                <Path d="M4 5h7" />
+                                <Path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+                                <Path d="M5 9c0 2.144 2.952 3.908 6.7 4" />
+                                <Path d="M12 20l4 -9l4 9" />
+                                <Path d="M19.1 18h-6.2" />
+                            </Svg>
+                            <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: colors.inkMid }}>
+                                {loc.settingsScreen?.systemLocaleBtn || "System Language Settings"}
+                            </Text>
+                        </Pressable>
+                    )}
                 </View>
 
                 {/* SECURITY & PRIVACY */}
@@ -757,7 +821,7 @@ export default function SettingsScreen() {
                                         }
                                     }}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, includeFontPadding: false, textAlign: 'center' }}>{loc.settingsScreen.save}</Text>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, textAlign: 'center' }}>{loc.settingsScreen.save}</Text>
                                 </Pressable>
                                 {ai.geminiApiKey ? (
                                     <Pressable
@@ -767,7 +831,7 @@ export default function SettingsScreen() {
                                             setSyncAlert({ visible: true, title: "Key Removed", sub: "Your API key has been removed." });
                                         }}
                                     >
-                                        <Text style={{ fontFamily: font.sansSemi, color: '#FF5E5B', fontSize: 13, includeFontPadding: false, textAlign: 'center' }}>{loc.settingsScreen.remove}</Text>
+                                        <Text style={{ fontFamily: font.sansSemi, color: '#FF5E5B', fontSize: 13, textAlign: 'center' }}>{loc.settingsScreen.remove}</Text>
                                     </Pressable>
                                 ) : null}
                             </View>
@@ -788,7 +852,7 @@ export default function SettingsScreen() {
                                     style={{ flex: 1, paddingVertical: 12, backgroundColor: colors.accent, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
                                     onPress={handleBackup}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, textAlign: 'center', includeFontPadding: false }}>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, textAlign: 'center' }}>
                                         {loc.settingsScreen.exportBackup}
                                     </Text>
                                 </Pressable>
@@ -797,7 +861,7 @@ export default function SettingsScreen() {
                                     style={{ flex: 1, paddingVertical: 12, backgroundColor: colors.bgRaised, borderWidth: 1, borderColor: colors.stroke, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
                                     onPress={handleRestore}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.inkMid, fontSize: 13, textAlign: 'center', includeFontPadding: false }}>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.inkMid, fontSize: 13, textAlign: 'center' }}>
                                         {loc.settingsScreen.importBackup}
                                     </Text>
                                 </Pressable>
@@ -878,8 +942,8 @@ export default function SettingsScreen() {
                         ].map((feat, i) => (
                             <View key={i} style={{ flexDirection: 'row', gap: 16 }}>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={{ fontFamily: font.sansBold, fontSize: 15, color: colors.ink, includeFontPadding: false }}>{feat.title}</Text>
-                                    <Text style={{ fontFamily: font.sans, fontSize: 13, color: colors.inkMid, marginTop: 2, includeFontPadding: false }}>{feat.desc}</Text>
+                                    <Text style={{ fontFamily: font.sansBold, fontSize: 15, color: colors.ink }}>{feat.title}</Text>
+                                    <Text style={{ fontFamily: font.sans, fontSize: 13, color: colors.inkMid, marginTop: 2 }}>{feat.desc}</Text>
                                 </View>
                             </View>
                         ))}
@@ -911,11 +975,11 @@ export default function SettingsScreen() {
                             {APP_CHANGELOG.slice(0, 1).map((item, idx) => (
                                 <View key={item.version} style={{ marginBottom: 24, borderBottomWidth: 0, paddingBottom: 16 }}>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                        <Text style={{ fontFamily: font.sansBold, fontSize: 18, color: colors.accent, includeFontPadding: false }}>v{item.version}</Text>
+                                        <Text style={{ fontFamily: font.sansBold, fontSize: 18, color: colors.accent }}>v{item.version}</Text>
                                         <Text style={{ fontFamily: font.mono, fontSize: 11, color: colors.inkDim }}>{item.date}</Text>
                                     </View>
                                     {(item.changes[settings.language.toLowerCase() as keyof typeof item.changes] || item.changes['en'])?.map((change, cIdx) => (
-                                        <Text key={cIdx} style={{ fontFamily: font.sans, fontSize: 14, color: colors.ink, marginBottom: 6, lineHeight: 20, includeFontPadding: false }}>
+                                        <Text key={cIdx} style={{ fontFamily: font.sans, fontSize: 14, color: colors.ink, marginBottom: 6, lineHeight: 20 }}>
                                             • {change}
                                         </Text>
                                     ))}

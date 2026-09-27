@@ -45,10 +45,13 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
             color: active ? colors.white : colors.inkMid,
             fontFamily: font.sansSemi,
             fontSize: 12,
-            includeFontPadding: false,
+            lineHeight: 18,
           },
         ]}
         numberOfLines={1}
+        adjustsFontSizeToFit={true}
+        minimumFontScale={0.8}
+        maxFontSizeMultiplier={1.2}
       >
         {label}
       </Text>
@@ -58,16 +61,19 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
 
 const styles = StyleSheet.create({
   pill: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
     borderWidth: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   rowPill: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   label: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
   },
 });

@@ -264,7 +264,8 @@ export default function HomeScreen() {
     listContent: { paddingBottom: 100 },
     noteContainer: { paddingHorizontal: 20 },
     headerLeft: {
-      flexShrink: 1, // Allow title to take only needed space
+      flex: 1,
+      marginRight: 12,
     },
     appNameRow: {
       flexDirection: 'row',
@@ -275,23 +276,19 @@ export default function HomeScreen() {
       fontFamily: font.sansBold,
       fontSize: 28, // Reduced from 32 to fit
       lineHeight: 34,
-      letterSpacing: -0.4,
-      includeFontPadding: false,
     },
     appNameHindi: {
       color: colors.ink,
       fontFamily: font.sansBold,
       fontSize: 28, // Reduced from 32 to fit
       lineHeight: 34,
-      letterSpacing: -0.4,
-      includeFontPadding: false,
     },
     appSub: {
       ...type.labelMedium,
       fontFamily: font.sansMed,
       color: colors.inkDim,
-      letterSpacing: 1.6,
-      textTransform: 'uppercase',
+      letterSpacing: lang !== 'En' ? 0 : 1.2,
+      textTransform: lang !== 'En' ? 'none' : 'uppercase',
       marginTop: 2,
     },
     selectionTitle: {
@@ -376,7 +373,7 @@ export default function HomeScreen() {
     textBtnLabel: {
       ...type.labelMedium, fontFamily: font.sansSemi, color: colors.ink
     },
-  }), [colors, font, radius, shadow, searchFocused, spacing, theme.fontSize]);
+  }), [colors, font, radius, shadow, searchFocused, spacing, theme.fontSize, lang, type]);
 
   const renderItem = useCallback(({ item }: { item: any }) => {
     const isItemSelected = selectedIds.has(item.id);
@@ -432,7 +429,15 @@ export default function HomeScreen() {
                 <Text style={s.appNameWordmark}>{HOME_BRAND_EN}</Text>
                 <Text style={s.appNameHindi}> {HOME_BRAND_HI}</Text>
               </Text>
-              <Text style={s.appSub}>{loc.appSub || "NOTES EXPERIENCE"}</Text>
+              <Text
+                style={s.appSub}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.8}
+                maxFontSizeMultiplier={1.2}
+              >
+                {loc.appSub || "NOTES EXPERIENCE"}
+              </Text>
             </View>
             <View style={s.headerRight}>
               <Pressable onPress={handleImport} style={s.circleBtn} hitSlop={theme.hitSlop} accessibilityLabel="Import notes">
@@ -474,7 +479,15 @@ export default function HomeScreen() {
               <Path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
               <Path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
             </Svg>
-            <Text style={s.deleteBtnLabel}>{loc.editor.delete || 'Delete'} ({selectedIds.size})</Text>
+            <Text
+              style={s.deleteBtnLabel}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.8}
+              maxFontSizeMultiplier={1.2}
+            >
+              {loc.editor.delete || 'Delete'} ({selectedIds.size})
+            </Text>
           </Pressable>
           <Pressable onPress={handleBulkExport} style={s.exportBtn} hitSlop={theme.hitSlop} accessibilityLabel="Export selected notes">
             <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.inkMid} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
@@ -482,7 +495,15 @@ export default function HomeScreen() {
               <Path d="M7 11l5 5l5 -5" />
               <Path d="M12 4l0 12" />
             </Svg>
-            <Text style={s.exportBtnLabel}>{loc.home.export || 'Export'}</Text>
+            <Text
+              style={s.exportBtnLabel}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.8}
+              maxFontSizeMultiplier={1.2}
+            >
+              {loc.home.export || 'Export'}
+            </Text>
           </Pressable>
         </View>
       )}

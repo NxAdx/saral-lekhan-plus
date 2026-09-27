@@ -59,7 +59,14 @@ export default function TrashScreen() {
             borderBottomColor: colors.strokeDim,
         },
         backBtn: { marginRight: 16, padding: 4 },
-        title: { fontFamily: font.sansBold, fontSize: 22 * theme.fontSize, color: colors.ink, flex: 1 },
+        title: {
+            fontFamily: font.sansBold,
+            fontSize: 22 * theme.fontSize,
+            lineHeight: Math.round(22 * theme.fontSize * 1.3),
+            color: colors.ink,
+            flex: 1,
+            marginRight: 8,
+        },
         emptyAllBtn: {
             flexDirection: 'row',
             alignItems: 'center',
@@ -70,12 +77,13 @@ export default function TrashScreen() {
             backgroundColor: colors.accentBg,
             borderWidth: 1,
             borderColor: colors.accent,
+            flexShrink: 0,
         },
         emptyAllText: {
             fontFamily: font.sansSemi,
             fontSize: 12,
+            lineHeight: 18,
             color: colors.accent,
-            includeFontPadding: false,
         },
 
         listContent: { paddingBottom: 100, paddingTop: 16 },
@@ -98,7 +106,15 @@ export default function TrashScreen() {
                         <Path d="M5 12l6 -6" />
                     </Svg>
                 </Pressable>
-                <Text style={s.title}>{loc.trash}</Text>
+                <Text
+                    style={s.title}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.8}
+                    maxFontSizeMultiplier={1.2}
+                >
+                    {loc.trash}
+                </Text>
                 {deletedNotes.length > 0 && (
                     <Pressable onPress={() => setShowEmptyTrashModal(true)} style={s.emptyAllBtn} hitSlop={theme.hitSlop} accessibilityLabel="Empty trash">
                         <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.accent} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
@@ -108,7 +124,15 @@ export default function TrashScreen() {
                             <Path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
                             <Path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                         </Svg>
-                        <Text style={s.emptyAllText}>{loc.emptyAll || 'Empty All'}</Text>
+                        <Text
+                            style={s.emptyAllText}
+                            numberOfLines={1}
+                            adjustsFontSizeToFit={true}
+                            minimumFontScale={0.8}
+                            maxFontSizeMultiplier={1.2}
+                        >
+                            {loc.emptyAll || 'Empty All'}
+                        </Text>
                     </Pressable>
                 )}
             </View>

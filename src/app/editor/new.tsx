@@ -466,12 +466,29 @@ export default function NewNoteScreen() {
     root: { flex: 1, backgroundColor: colors.bg, paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 44 },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.strokeDim + '44' },
     circleBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.stroke, backgroundColor: colors.bgRaised, justifyContent: 'center', alignItems: 'center', ...shadow.gentle, shadowColor: colors.shadow },
-    headerMid: { flex: 1, alignItems: 'center' },
+    headerMid: { flex: 1, alignItems: 'center', overflow: 'hidden', paddingHorizontal: 4 },
     headerDate: { fontFamily: font.mono, fontSize: 11, color: colors.inkDim },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-    doneBtn: { backgroundColor: colors.accent, paddingVertical: 8, paddingHorizontal: 14, borderRadius: radius.pill, ...shadow.gentle, shadowColor: colors.accentDark },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 },
+    doneBtn: {
+      backgroundColor: colors.accent,
+      paddingVertical: 7,
+      paddingHorizontal: 12,
+      borderRadius: radius.pill,
+      flexShrink: 0,
+      maxWidth: 90,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...shadow.gentle,
+      shadowColor: colors.accentDark,
+    },
     doneBtnActive: { transform: [{ translateY: 2 }], shadowOffset: { width: 0, height: 1 }, elevation: 1 },
-    doneBtnText: { fontFamily: font.sansSemi, fontSize: 13, color: colors.white },
+    doneBtnText: {
+      fontFamily: font.sansSemi,
+      fontSize: 13,
+      lineHeight: 18,
+      color: colors.white,
+      textAlign: 'center',
+    },
 
     editorFrame: { flex: 1 },
     titleBox: {
@@ -601,7 +618,15 @@ export default function NewNoteScreen() {
             </Svg>
           </Pressable>
           <Pressable onPress={handleDone} style={({ pressed }) => [s.doneBtn, pressed && s.doneBtnActive]} hitSlop={theme.hitSlop}>
-            <Text style={s.doneBtnText}>{loc.editor.done}</Text>
+            <Text
+              style={s.doneBtnText}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.75}
+              maxFontSizeMultiplier={1.2}
+            >
+              {loc.editor.done}
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -764,7 +789,7 @@ export default function NewNoteScreen() {
               <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
                 <Path d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2zm-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6z" />
               </Svg>
-              <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim, includeFontPadding: false }}>Spark AI</Text>
+              <Text style={{ fontFamily: font.sansSemi, fontSize: 13, color: Boolean(ai.geminiApiKey) ? colors.accent : colors.inkDim }}>Spark AI</Text>
             </Pressable>
 
             <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
@@ -885,7 +910,7 @@ export default function NewNoteScreen() {
                     </>
                   )}
                 </Svg>
-                <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim, includeFontPadding: false }}>
+                <Text style={{ fontFamily: font.sansSemi, fontSize: 12, color: isSpeaking ? colors.accent : colors.inkDim }}>
                   {isSpeaking ? 'Stop' : 'Listen'}
                 </Text>
               </Pressable>
