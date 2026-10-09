@@ -734,8 +734,8 @@ export default function SettingsScreen() {
                                 </Svg>
                             </View>
                             <View style={s.listContent}>
-                                <Text style={s.listLabel}>{loc.settingsScreen.displayLanguage}</Text>
-                                <Text style={s.listSub}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
+                                <Text style={s.listLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{loc.settingsScreen.displayLanguage}</Text>
+                                <Text style={s.listSub} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
