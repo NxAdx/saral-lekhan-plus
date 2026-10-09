@@ -590,29 +590,31 @@ export default function EditNoteScreen() {
       ...shadow.gentle, shadowColor: colors.shadow
     },
     circleBtnActive: { backgroundColor: colors.accent, borderColor: colors.accentDark },
-    headerMid: { flex: 1, alignItems: 'center', overflow: 'hidden', paddingHorizontal: 4 },
-    headerDate: { fontFamily: font.mono, fontSize: 11 * theme.fontSize, color: colors.inkDim },
-    savedBadge: { fontFamily: font.mono, fontSize: 9 * theme.fontSize, color: colors.accent, marginTop: 2 },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 },
+    headerMid: { flex: 1, alignItems: 'center', paddingHorizontal: 4 },
+    headerDate: { fontFamily: font.mono, fontSize: 11, color: colors.inkDim },
+    savedBadge: { fontFamily: font.sansBold, fontSize: 10, color: colors.accent, marginTop: 2, lineHeight: 14 },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 0 },
     doneBtn: {
-      backgroundColor: colors.accent,
-      paddingVertical: 7,
-      paddingHorizontal: 12,
+      height: 38,
+      minWidth: 68,
+      paddingHorizontal: 16,
       borderRadius: radius.pill,
-      flexShrink: 0,
-      maxWidth: 90,
+      backgroundColor: colors.accent,
       justifyContent: 'center',
       alignItems: 'center',
+      flexDirection: 'row',
+      flexShrink: 0,
       ...shadow.gentle,
       shadowColor: colors.accentDark,
     },
     doneBtnActive: { transform: [{ translateY: 2 }], shadowOffset: { width: 0, height: 1 }, elevation: 1 },
     doneBtnText: {
-      fontFamily: font.sansSemi,
-      fontSize: 13,
-      lineHeight: 18,
+      fontFamily: font.sansBold,
+      fontSize: settings.language === 'En' ? 13 : 12,
       color: colors.white,
       textAlign: 'center',
+      textAlignVertical: 'center',
+      includeFontPadding: settings.language === 'En' ? false : true,
     },
     exportBtnText: { color: colors.white }, // High contrast for share/export
 
@@ -700,7 +702,7 @@ export default function EditNoteScreen() {
       marginHorizontal: 2,
       marginVertical: 0,
     },
-  }), [colors, font, insets.bottom, radius, shadow, theme.fontSize, type.bodyLarge, type.labelMedium]);
+  }), [colors, font, insets.bottom, radius, shadow, theme.fontSize, type.bodyLarge, type.labelMedium, settings.language]);
 
   if (!note && !isDeleting) {
     return (

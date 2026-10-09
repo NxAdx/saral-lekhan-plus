@@ -35,7 +35,7 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
         },
         animStyle
       ]}
-      hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+      hitSlop={hitSlop}
     >
       {icon}
       <Text
@@ -45,7 +45,8 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
             color: active ? colors.white : colors.inkMid,
             fontFamily: font.sansSemi,
             fontSize: 12,
-            lineHeight: 18,
+            lineHeight: 20,
+            textAlignVertical: 'center',
           },
         ]}
         numberOfLines={1}
@@ -61,7 +62,8 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
 
 const styles = StyleSheet.create({
   pill: {
-    paddingVertical: 5,
+    minHeight: 34,
+    paddingVertical: 6,
     paddingHorizontal: 12,
     borderWidth: 1.5,
     justifyContent: 'center',

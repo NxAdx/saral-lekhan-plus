@@ -465,29 +465,32 @@ export default function NewNoteScreen() {
   const s = useMemo(() => StyleSheet.create({
     root: { flex: 1, backgroundColor: colors.bg, paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 24) : 44 },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.strokeDim + '44' },
-    circleBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.stroke, backgroundColor: colors.bgRaised, justifyContent: 'center', alignItems: 'center', ...shadow.gentle, shadowColor: colors.shadow },
-    headerMid: { flex: 1, alignItems: 'center', overflow: 'hidden', paddingHorizontal: 4 },
+    circleBtn: { width: 38, height: 38, borderRadius: 19, borderWidth: 1.5, borderColor: colors.stroke, backgroundColor: colors.bgRaised, justifyContent: 'center', alignItems: 'center', ...shadow.gentle, shadowColor: colors.shadow },
+    circleBtnActive: { backgroundColor: colors.accent, borderColor: colors.accentDark },
+    headerMid: { flex: 1, alignItems: 'center', paddingHorizontal: 4 },
     headerDate: { fontFamily: font.mono, fontSize: 11, color: colors.inkDim },
-    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0 },
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 10, flexShrink: 0 },
     doneBtn: {
-      backgroundColor: colors.accent,
-      paddingVertical: 7,
-      paddingHorizontal: 12,
+      height: 38,
+      minWidth: 68,
+      paddingHorizontal: 16,
       borderRadius: radius.pill,
-      flexShrink: 0,
-      maxWidth: 90,
+      backgroundColor: colors.accent,
       justifyContent: 'center',
       alignItems: 'center',
+      flexDirection: 'row',
+      flexShrink: 0,
       ...shadow.gentle,
       shadowColor: colors.accentDark,
     },
     doneBtnActive: { transform: [{ translateY: 2 }], shadowOffset: { width: 0, height: 1 }, elevation: 1 },
     doneBtnText: {
-      fontFamily: font.sansSemi,
-      fontSize: 13,
-      lineHeight: 18,
+      fontFamily: font.sansBold,
+      fontSize: settings.language === 'En' ? 13 : 12,
       color: colors.white,
       textAlign: 'center',
+      textAlignVertical: 'center',
+      includeFontPadding: settings.language === 'En' ? false : true,
     },
 
     editorFrame: { flex: 1 },
@@ -572,7 +575,7 @@ export default function NewNoteScreen() {
       marginHorizontal: 2,
       marginVertical: 0,
     },
-  }), [colors, font, insets.bottom, radius, shadow, theme.fontSize, type.bodyLarge, type.labelMedium]);
+  }), [colors, font, insets.bottom, radius, shadow, theme.fontSize, type.bodyLarge, type.labelMedium, settings.language]);
 
   const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }).toUpperCase();
   const wc = wordCount(bodyText);

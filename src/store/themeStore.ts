@@ -22,7 +22,7 @@ type ThemeValue = {
     };
     isDark: boolean;
     fontSize: number;
-    hitSlop: number;
+    hitSlop: { top: number; bottom: number; left: number; right: number };
 };
 
 const HIND_FONT_SET = {
@@ -74,6 +74,11 @@ export const useTheme = () => {
         font: HIND_FONT_SET as any,
         isDark,
         fontSize: 1.0,
-        hitSlop: largeTouch ? 24 : 10,
+        hitSlop: {
+            top: largeTouch ? 14 : 8,
+            bottom: largeTouch ? 14 : 8,
+            left: largeTouch ? 4 : 2,
+            right: largeTouch ? 4 : 2,
+        },
     }), [colors, isDark, largeTouch]);
 };

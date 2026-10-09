@@ -54,13 +54,14 @@ export const BentoCard = React.memo(({
             fontFamily: font.sansBold,
             color: (selected || pinned) ? colors.accent : colors.ink,
             marginBottom: 4,
-            lineHeight: Math.round(type.titleLarge.fontSize * 1.38),
+            paddingVertical: 2,
+            lineHeight: Math.round(type.titleLarge.fontSize * 1.48),
         },
         preview: {
             ...type.bodyLarge,
             fontFamily: font.sans,
             color: colors.inkMid,
-            lineHeight: Math.round(type.bodyLarge.fontSize * 1.45),
+            lineHeight: Math.round(type.bodyLarge.fontSize * 1.50),
             opacity: 0.85,
         },
         metaRow: {
@@ -89,7 +90,8 @@ export const BentoCard = React.memo(({
             fontFamily: font.sansBold,
             color: colors.accent,
             fontSize: Math.round(type.labelMedium.fontSize * 0.88),
-            lineHeight: Math.round(type.labelMedium.fontSize * 1.35),
+            lineHeight: Math.round(type.labelMedium.fontSize * 1.45),
+            textAlignVertical: 'center',
         },
         selectionIcon: {
             position: 'absolute',

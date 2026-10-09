@@ -167,7 +167,6 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 380,
     borderWidth: 1.5,
-    overflow: 'hidden',
     padding: 20,
   },
   header: {
@@ -184,11 +183,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
+    lineHeight: 26,
     textAlign: 'center',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 12,
+    lineHeight: 18,
     textAlign: 'center',
   },
   list: {
@@ -203,22 +204,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 56,
+    paddingVertical: 10,
+    minHeight: 58,
     borderWidth: 1.5,
   },
   langInfo: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 10,
+    justifyContent: 'center',
     flex: 1,
+    paddingVertical: 2,
   },
   nativeName: {
     fontSize: 16,
-    lineHeight: 22,
+    lineHeight: 24,
+    paddingVertical: 1,
   },
   englishName: {
-    fontSize: 13,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 2,
   },
   radioCircle: {
     width: 22,
@@ -240,5 +243,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnText: {
     fontSize: 14,
+    lineHeight: 20,
   },
 });

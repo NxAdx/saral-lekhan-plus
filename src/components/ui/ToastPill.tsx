@@ -99,6 +99,6 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 14,
-        includeFontPadding: false,
+        lineHeight: 20,
     }
 });

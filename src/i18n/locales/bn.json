@@ -20,8 +20,8 @@
     "editor": {
         "titlePlaceholder": "শিরোনাম...",
         "bodyPlaceholder": "এখানে লেখা শুরু করুন...",
-        "done": "সম্পন্ন ✓",
-        "saved": "সংরক্ষিত ✓",
+        "done": "সম্পন্ন",
+        "saved": "সংরক্ষিত",
         "deleteNote": "নোট মুছুন",
         "deleteNoteSub": "আপনি কি এই নোটটি মুছতে চান?",
         "cancel": "বাতিল",

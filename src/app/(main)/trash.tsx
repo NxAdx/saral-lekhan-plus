@@ -62,7 +62,7 @@ export default function TrashScreen() {
         title: {
             fontFamily: font.sansBold,
             fontSize: 22 * theme.fontSize,
-            lineHeight: Math.round(22 * theme.fontSize * 1.3),
+            lineHeight: Math.round(22 * theme.fontSize * (lang === 'En' ? 1.3 : 1.48)),
             color: colors.ink,
             flex: 1,
             marginRight: 8,
@@ -82,7 +82,8 @@ export default function TrashScreen() {
         emptyAllText: {
             fontFamily: font.sansSemi,
             fontSize: 12,
-            lineHeight: 18,
+            lineHeight: 20,
+            textAlignVertical: 'center',
             color: colors.accent,
         },
 

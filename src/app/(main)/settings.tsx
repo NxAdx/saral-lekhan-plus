@@ -292,7 +292,16 @@ export default function SettingsScreen() {
         title: { fontFamily: font.sansBold, fontSize: 22, color: colors.ink },
         content: { padding: 20, paddingBottom: 100 },
 
-        sectionTitle: { fontFamily: font.sansBold, fontSize: 13 * theme.fontSize, color: colors.accent, textTransform: settings.language !== 'En' ? 'none' : 'uppercase', marginBottom: 12, marginTop: 24, letterSpacing: settings.language !== 'En' ? 0 : 0.8 },
+        sectionTitle: {
+            fontFamily: font.sansBold,
+            fontSize: 13 * theme.fontSize,
+            lineHeight: 20,
+            color: colors.accent,
+            textTransform: settings.language !== 'En' ? 'none' : 'uppercase',
+            marginBottom: 12,
+            marginTop: 24,
+            letterSpacing: settings.language !== 'En' ? 0 : 0.8
+        },
 
         // Live Preview
         previewBox: { marginBottom: 10 },
@@ -318,15 +327,16 @@ export default function SettingsScreen() {
         listLabel: {
             fontFamily: font.sansBold,
             fontSize: type.titleLarge.fontSize - 2,
-            lineHeight: Math.round((type.titleLarge.fontSize - 2) * 1.35),
+            lineHeight: Math.round((type.titleLarge.fontSize - 2) * (settings.language === 'En' ? 1.38 : 1.50)),
             color: colors.ink,
             marginBottom: 2,
             flexShrink: 1,
+            paddingVertical: 1,
         },
         listSub: {
             ...type.labelMedium,
             fontFamily: font.sans,
-            lineHeight: Math.round(type.labelMedium.fontSize * 1.38),
+            lineHeight: Math.round(type.labelMedium.fontSize * (settings.language === 'En' ? 1.38 : 1.50)),
             color: colors.inkMid,
             flexShrink: 1,
         },
@@ -334,16 +344,21 @@ export default function SettingsScreen() {
 
         // Control buttons
         modeBtn: {
-            flex: 1, paddingVertical: 10, alignItems: 'center', justifyContent: 'center',
-            borderRightWidth: 1, borderRightColor: colors.strokeDim,
+            flex: 1,
+            minHeight: 42,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRightWidth: 1,
+            borderRightColor: colors.strokeDim,
         },
         modeBtnLast: { borderRightWidth: 0 },
         activeMode: { backgroundColor: colors.accent },
         modeText: {
             fontFamily: font.sansSemi,
-            fontSize: 13 * theme.fontSize,
-            lineHeight: 18,
+            fontSize: settings.language === 'En' ? 13 : 12,
+            lineHeight: 20,
             textAlign: 'center',
+            textAlignVertical: 'center',
             paddingHorizontal: 2,
         },
 
