@@ -765,6 +765,7 @@ export default function NewNoteScreen() {
                   <Pressable
                     onPress={() => scrollRef.current?.scrollTo({ y: 0, animated: true })}
                     style={[s.circleBtn, { backgroundColor: colors.bgRaised, width: 40, height: 40 }]}
+                    hitSlop={theme.hitSlop}
                     accessibilityLabel="Back to top"
                   >
                     <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">

@@ -587,8 +587,8 @@ export default function SettingsScreen() {
                     {/* High Contrast Toggle */}
                     <View style={s.listItem}>
                         <View style={s.listContent}>
-                            <Text style={s.listLabel}>High Contrast Mode</Text>
-                            <Text style={s.listSub}>Increases contrast for text and lines to improve readability.</Text>
+                            <Text style={s.listLabel}>{loc.settingsScreen.highContrast || 'High Contrast Mode'}</Text>
+                            <Text style={s.listSub}>{loc.settingsScreen.highContrastSub || 'Increases contrast for text and lines to improve readability.'}</Text>
                         </View>
                         <Switch
                             value={settings.highContrast}
@@ -604,8 +604,8 @@ export default function SettingsScreen() {
                     {/* Large Touch Toggle */}
                     <View style={[s.listItem, s.listItemNoBorder]}>
                         <View style={s.listContent}>
-                            <Text style={s.listLabel}>Large Touch Targets</Text>
-                            <Text style={s.listSub}>Increases the tappable area of buttons for easier navigation.</Text>
+                            <Text style={s.listLabel}>{loc.settingsScreen.largeTouch || 'Large Touch Targets'}</Text>
+                            <Text style={s.listSub}>{loc.settingsScreen.largeTouchSub || 'Increases the tappable area of buttons for easier navigation.'}</Text>
                         </View>
                         <Switch
                             value={settings.largeTouch}
@@ -887,6 +887,36 @@ export default function SettingsScreen() {
                             </View>
                         </View>
                     </View>
+                </View>
+
+                {/* TOOLS & CONNECTIVITY */}
+                <Text style={s.sectionTitle}>{loc.settingsScreen.toolsConnectivity || 'Tools & Connectivity'}</Text>
+                <View style={s.listBlock}>
+                    <Pressable
+                        style={[s.listItem, s.listItemNoBorder]}
+                        onPress={() => {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                            setShowWebShareModal(true);
+                        }}
+                    >
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, flex: 1 }}>
+                            <View style={{ width: 38, height: 38, borderRadius: theme.radius.sm, backgroundColor: colors.accentBg, justifyContent: 'center', alignItems: 'center' }}>
+                                <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={colors.accent} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+                                    <Path d="M12 18l.01 0" />
+                                    <Path d="M9.172 15.172a4 4 0 0 1 5.656 0" />
+                                    <Path d="M6.343 12.343a8 8 0 0 1 11.314 0" />
+                                    <Path d="M3.515 9.515c4.686 -4.687 12.284 -4.687 16.97 0" />
+                                </Svg>
+                            </View>
+                            <View style={s.listContent}>
+                                <Text style={s.listLabel}>{loc.settingsScreen.webShareTitle || 'Web Share Studio'}</Text>
+                                <Text style={s.listSub}>{loc.settingsScreen.webShareSub || 'Edit notes on your computer browser over Wi-Fi or Hotspot'}</Text>
+                            </View>
+                        </View>
+                        <Svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={colors.inkDim} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                            <Path d="M9 6l6 6l-6 6" />
+                        </Svg>
+                    </Pressable>
                 </View>
 
                 {/* HELP & FEEDBACK */}

@@ -3,6 +3,8 @@ import { View, Text, Pressable, ActivityIndicator, ScrollView, Platform, Clipboa
 import Svg, { Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../store/themeStore';
+import { useSettingsStore } from '../../store/settingsStore';
+import { strings } from '../../i18n/strings';
 import { ThemedModal } from './ThemedModal';
 import {
   startWebShareServer,
@@ -19,6 +21,8 @@ interface WebShareModalProps {
 
 export function WebShareModal({ visible, onClose, onShowToast }: WebShareModalProps) {
   const { colors, font, radius, shadow, isDark } = useTheme();
+  const language = useSettingsStore((s) => s.language);
+  const loc = strings[language] || strings['En'];
   const [isRunning, setIsRunning] = useState(false);
   const [endpoints, setEndpoints] = useState<NetworkEndpointInfo[]>([]);
   const [primaryUrl, setPrimaryUrl] = useState<string | null>(null);
@@ -312,7 +316,7 @@ export function WebShareModal({ visible, onClose, onShowToast }: WebShareModalPr
       customContent={customContent}
       actions={[
         {
-          label: 'Done',
+          label: loc.editor?.done || 'Done',
           onPress: onClose,
           style: 'default',
         },
