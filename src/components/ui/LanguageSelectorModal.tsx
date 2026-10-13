@@ -6,6 +6,8 @@ import { useTheme } from '../../store/themeStore';
 import { AppLanguage } from '../../store/settingsStore';
 import { strings } from '../../i18n/strings';
 
+import * as IntentLauncher from 'expo-intent-launcher';
+
 export interface LanguageOption {
   id: AppLanguage;
   nativeName: string;
@@ -38,6 +40,24 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
   const { colors, font, radius, shadow } = useTheme();
   const loc = strings[currentLanguage] || strings['En'];
 
+  const handleOpenSystemSettings = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        await IntentLauncher.startActivityAsync('android.settings.APP_LOCALE_SETTINGS', {
+          data: 'package:com.sarallekhan',
+        });
+        onClose();
+      } catch (_e) {
+        try {
+          await IntentLauncher.startActivityAsync('android.settings.LOCALE_SETTINGS');
+          onClose();
+        } catch (_err) {
+          // If system intents are restricted by OEM, stay in in-app picker
+        }
+      }
+    }
+  };
+
   if (!visible) return null;
 
   return (
@@ -49,11 +69,32 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
       statusBarTranslucent
     >
       <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={[styles.dialog, { backgroundColor: colors.bgRaised, borderColor: colors.stroke, borderRadius: radius.xl, ...shadow.hard, shadowColor: colors.shadow }]} onPress={(e) => e.stopPropagation()}>
+        <Pressable
+          style={[
+            styles.dialog,
+            {
+              backgroundColor: colors.bgRaised,
+              borderColor: colors.stroke,
+              borderRadius: radius.xl,
+              ...shadow.hard,
+              shadowColor: colors.shadow,
+            },
+          ]}
+          onPress={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <View style={styles.header}>
             <View style={[styles.iconWrap, { backgroundColor: colors.accentBg }]}>
-              <Svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={colors.accent} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <Svg
+                viewBox="0 0 24 24"
+                width={22}
+                height={22}
+                fill="none"
+                stroke={colors.accent}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <Path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
                 <Path d="M3.6 9h16.8" />
                 <Path d="M3.6 15h16.8" />
@@ -70,13 +111,13 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
           </View>
 
           {/* Languages List */}
-          <ScrollView style={styles.list} contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.list}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          >
             {SUPPORTED_LANGUAGES.map((lang) => {
               const isSelected = currentLanguage === lang.id;
-              // Determine script-specific font family for the native name so it never renders under wrong font bounding box
-              const nativeFontFamily = (Platform.OS === 'android' && (lang.id === 'Bn' || lang.id === 'Te' || lang.id === 'Ta'))
-                ? 'sans-serif-medium'
-                : font.sansBold;
 
               return (
                 <Pressable
@@ -101,9 +142,9 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                         styles.nativeName,
                         {
                           color: isSelected ? colors.accent : colors.ink,
-                          fontFamily: nativeFontFamily,
+                          fontFamily: font.sansBold,
                           fontSize: 16,
-                          lineHeight: 26,
+                          lineHeight: 24,
                         },
                       ]}
                       numberOfLines={1}
@@ -135,7 +176,16 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                     ]}
                   >
                     {isSelected && (
-                      <Svg viewBox="0 0 24 24" width={14} height={14} fill="none" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+                      <Svg
+                        viewBox="0 0 24 24"
+                        width={14}
+                        height={14}
+                        fill="none"
+                        stroke="#FFFFFF"
+                        strokeWidth={3}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <Path d="M5 12l5 5l10 -10" />
                       </Svg>
                     )}
@@ -143,15 +193,81 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                 </Pressable>
               );
             })}
+
+            {/* Android 13+ Per-App Language Settings Intent Tile */}
+            {Platform.OS === 'android' && (
+              <Pressable
+                style={[
+                  styles.systemBtn,
+                  {
+                    backgroundColor: colors.bg,
+                    borderColor: colors.strokeDim,
+                    borderRadius: radius.md,
+                  },
+                ]}
+                onPress={handleOpenSystemSettings}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <Svg
+                    viewBox="0 0 24 24"
+                    width={18}
+                    height={18}
+                    fill="none"
+                    stroke={colors.accent}
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <Path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z" />
+                    <Path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+                  </Svg>
+                  <Text
+                    style={{
+                      fontFamily: font.sansSemi,
+                      fontSize: 13,
+                      color: colors.ink,
+                      flexShrink: 1,
+                    }}
+                    numberOfLines={1}
+                  >
+                    {loc.settingsScreen?.systemLocaleBtn || 'System Language Settings'}
+                  </Text>
+                </View>
+                <Svg
+                  viewBox="0 0 24 24"
+                  width={16}
+                  height={16}
+                  fill="none"
+                  stroke={colors.inkDim}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <Path d="M9 6l6 6l-6 6" />
+                </Svg>
+              </Pressable>
+            )}
           </ScrollView>
 
           {/* Footer Close Button */}
           <View style={styles.footer}>
             <Pressable
-              style={[styles.cancelBtn, { backgroundColor: colors.bgDeep, borderColor: colors.strokeDim, borderRadius: radius.pill }]}
+              style={[
+                styles.cancelBtn,
+                {
+                  backgroundColor: colors.bgDeep,
+                  borderColor: colors.strokeDim,
+                  borderRadius: radius.pill,
+                },
+              ]}
               onPress={onClose}
             >
-              <Text style={[styles.cancelBtnText, { color: colors.inkMid, fontFamily: font.sansSemi }]}>
+              <Text
+                style={[
+                  styles.cancelBtnText,
+                  { color: colors.inkMid, fontFamily: font.sansSemi },
+                ]}
+              >
                 {loc.editor?.cancel || 'Cancel'}
               </Text>
             </Pressable>
@@ -241,6 +357,16 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 14,
+  },
+  systemBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 52,
+    borderWidth: 1.5,
+    marginTop: 4,
   },
   cancelBtn: {
     paddingVertical: 12,

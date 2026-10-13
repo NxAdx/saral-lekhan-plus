@@ -149,9 +149,9 @@
         "noBackupsYet": "अद्याप कोणताही स्वयंचलित बॅकअप आढळला नाही.",
         "backupDeleted": "बॅकअप हटवला",
         "backupSuccess": "बॅकअप यशस्वीरित्या तयार झाला!",
-        "backupNow": "आता बॅकअप घ्या",
+        "backupNow": "आता बॅकअप",
         "creatingBackup": "बॅकअप घेतला जात आहे...",
-        "backupHistoryBtn": "बॅकअप व्हॉल्ट आणि इतिहास",
+        "backupHistoryBtn": "व्हॉल्ट व इतिहास",
         "lastAutoBackup": "शेवटचा बॅकअप",
         "never": "कधीही नाही",
         "restoreSuccess": "बॅकअप यशस्वीरित्या पुनर्संचयित झाला!"

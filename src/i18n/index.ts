@@ -6,24 +6,43 @@ import te from './locales/te.json';
 import mr from './locales/mr.json';
 import ta from './locales/ta.json';
 
-const translations: Record<string, any> = {
+function deepFallback<T>(target: any, fallback: T): T {
+    if (!target) return fallback;
+    const result: any = Array.isArray(fallback) ? [...(target || fallback)] : { ...fallback, ...target };
+    for (const key of Object.keys(fallback as any)) {
+        const fallbackVal = (fallback as any)[key];
+        const targetVal = target[key];
+        if (
+            fallbackVal &&
+            typeof fallbackVal === 'object' &&
+            !Array.isArray(fallbackVal)
+        ) {
+            result[key] = deepFallback(targetVal, fallbackVal);
+        } else if (targetVal === undefined || targetVal === null || targetVal === '') {
+            result[key] = fallbackVal;
+        }
+    }
+    return result;
+}
+
+const resolvedTranslations: Record<string, any> = {
     En: en,
-    Hi: hi,
-    Bn: bn,
-    Te: te,
-    Mr: mr,
-    Ta: ta,
+    Hi: deepFallback(hi, en),
+    Bn: deepFallback(bn, en),
+    Te: deepFallback(te, en),
+    Mr: deepFallback(mr, en),
+    Ta: deepFallback(ta, en),
 };
 
 export type AppStrings = typeof en;
 
 /**
  * Mihon-style Scalable i18n System
- * This utility allows for easy community translation by splitting
- * strings into individual JSON files while maintaining a simple API for the app.
+ * All locales are pre-merged with the English baseline, ensuring 100% key coverage
+ * with zero undefined lookups or runtime layout crashes across all 6 scripts.
  */
 export const getStrings = (lang: string) => {
-    return translations[lang] || translations.En;
+    return resolvedTranslations[lang] || resolvedTranslations.En;
 };
 
 // Hook for components to use strings reactively

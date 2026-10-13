@@ -100,8 +100,21 @@ export function LockScreen() {
                         <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </Svg>
                 </View>
-                <Text style={{ fontFamily: font.display, fontSize: 32, color: colors.ink, marginBottom: 8 }}>{loc.lockScreen.vaultLocked}</Text>
-                <Text style={{ fontFamily: font.sans, fontSize: 16, color: colors.inkDim }}>{loc.lockScreen.vaultSub}</Text>
+                <Text
+                    style={{
+                        fontFamily: lang === 'En' ? font.display : font.sansBold,
+                        fontSize: 26,
+                        lineHeight: 34,
+                        color: colors.ink,
+                        marginBottom: 8,
+                        textAlign: 'center',
+                        paddingHorizontal: 20,
+                    }}
+                    numberOfLines={1}
+                >
+                    {loc.lockScreen.vaultLocked}
+                </Text>
+                <Text style={{ fontFamily: font.sans, fontSize: 16, color: colors.inkDim, textAlign: 'center', paddingHorizontal: 20 }}>{loc.lockScreen.vaultSub}</Text>
             </View>
 
             {errorText ? (

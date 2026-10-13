@@ -323,6 +323,7 @@ export default function SettingsScreen() {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            minHeight: 56,
             padding: 16,
             borderBottomWidth: 1,
             borderBottomColor: colors.strokeDim,
@@ -349,7 +350,7 @@ export default function SettingsScreen() {
         // Control buttons
         modeBtn: {
             flex: 1,
-            minHeight: 42,
+            minHeight: 44,
             alignItems: 'center',
             justifyContent: 'center',
             borderRightWidth: 1,
@@ -523,12 +524,15 @@ export default function SettingsScreen() {
                                     backgroundColor: colors.bgRaised,
                                     borderWidth: 1,
                                     borderColor: colors.strokeDim,
-                                    paddingHorizontal: 14,
+                                    paddingHorizontal: 12,
                                     paddingVertical: 8,
+                                    minHeight: 38,
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
                                     borderRadius: theme.radius.sm
                                 }}
                             >
-                                <Text style={{ color: colors.ink, fontFamily: font.sansSemi, fontSize: 13 }}>
+                                <Text style={{ color: colors.ink, fontFamily: font.sansSemi, fontSize: 13 }} numberOfLines={1}>
                                     {loc.settingsScreen.checkForUpdates}
                                 </Text>
                             </Pressable>
@@ -736,7 +740,7 @@ export default function SettingsScreen() {
                             </View>
                             <View style={s.listContent}>
                                 <Text style={s.listLabel} numberOfLines={1}>{loc.settingsScreen.displayLanguage}</Text>
-                                <Text style={s.listSub} numberOfLines={1}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
+                                <Text style={s.listSub} numberOfLines={2} ellipsizeMode="tail">{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -881,7 +885,8 @@ export default function SettingsScreen() {
                                             }}
                                             style={{
                                                 flex: 1,
-                                                paddingVertical: 7,
+                                                minHeight: 34,
+                                                paddingVertical: 6,
                                                 borderRadius: theme.radius.sm,
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
@@ -890,10 +895,12 @@ export default function SettingsScreen() {
                                         >
                                             <Text
                                                 numberOfLines={1}
+                                                ellipsizeMode="tail"
                                                 style={{
-                                                    fontSize: 12,
+                                                    fontSize: 11,
                                                     fontFamily: active ? font.sansBold : font.sansMed,
                                                     color: active ? colors.white : colors.inkMid,
+                                                    textAlign: 'center',
                                                 }}
                                             >
                                                 {item.label}
@@ -911,11 +918,13 @@ export default function SettingsScreen() {
                             </View>
 
                             {/* Action Buttons: Backup Now & History Vault */}
-                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, alignItems: 'stretch' }}>
                                 <Pressable
                                     disabled={backupStore.isBackingUp}
                                     style={{
                                         flex: 1,
+                                        minHeight: 44,
+                                        paddingHorizontal: 8,
                                         paddingVertical: 10,
                                         backgroundColor: colors.accent,
                                         borderRadius: theme.radius.md,
@@ -932,7 +941,7 @@ export default function SettingsScreen() {
                                         }
                                     }}
                                 >
-                                    <Text style={{ fontFamily: font.sansBold, color: colors.white, fontSize: 13 }}>
+                                    <Text style={{ fontFamily: font.sansBold, color: colors.white, fontSize: 13, textAlign: 'center' }} numberOfLines={1} ellipsizeMode="tail">
                                         {backupStore.isBackingUp ? (loc.settingsScreen.creatingBackup || 'Backing up...') : (loc.settingsScreen.backupNow || 'Backup Now')}
                                     </Text>
                                 </Pressable>
@@ -940,6 +949,8 @@ export default function SettingsScreen() {
                                 <Pressable
                                     style={{
                                         flex: 1,
+                                        minHeight: 44,
+                                        paddingHorizontal: 8,
                                         paddingVertical: 10,
                                         backgroundColor: colors.bgRaised,
                                         borderWidth: 1,
@@ -953,7 +964,7 @@ export default function SettingsScreen() {
                                         setShowBackupVaultModal(true);
                                     }}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.ink, fontSize: 13 }}>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.ink, fontSize: 13, textAlign: 'center' }} numberOfLines={1} ellipsizeMode="tail">
                                         {loc.settingsScreen.backupHistoryBtn || 'Backup Vault & History'}
                                     </Text>
                                 </Pressable>
@@ -967,21 +978,21 @@ export default function SettingsScreen() {
                             <Text style={s.listLabel}>{loc.settingsScreen.dataVault}</Text>
                             <Text style={s.listSub}>{loc.settingsScreen.dataVaultSub}</Text>
 
-                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, alignItems: 'stretch' }}>
                                 <Pressable
-                                    style={{ flex: 1, paddingVertical: 12, backgroundColor: colors.accent, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
+                                    style={{ flex: 1, minHeight: 44, paddingHorizontal: 8, paddingVertical: 10, backgroundColor: colors.accent, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
                                     onPress={handleBackup}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, textAlign: 'center' }}>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.white, fontSize: 13, textAlign: 'center' }} numberOfLines={1} ellipsizeMode="tail">
                                         {loc.settingsScreen.exportBackup}
                                     </Text>
                                 </Pressable>
 
                                 <Pressable
-                                    style={{ flex: 1, paddingVertical: 12, backgroundColor: colors.bgRaised, borderWidth: 1, borderColor: colors.stroke, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
+                                    style={{ flex: 1, minHeight: 44, paddingHorizontal: 8, paddingVertical: 10, backgroundColor: colors.bgRaised, borderWidth: 1, borderColor: colors.stroke, borderRadius: theme.radius.md, alignItems: 'center', justifyContent: 'center' }}
                                     onPress={handleRestore}
                                 >
-                                    <Text style={{ fontFamily: font.sansSemi, color: colors.inkMid, fontSize: 13, textAlign: 'center' }}>
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.inkMid, fontSize: 13, textAlign: 'center' }} numberOfLines={1} ellipsizeMode="tail">
                                         {loc.settingsScreen.importBackup}
                                     </Text>
                                 </Pressable>

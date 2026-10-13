@@ -25,6 +25,7 @@ interface SettingsState {
     highContrast: boolean;
     largeTouch: boolean;
 
+    syncDeviceLanguageIfDefault: () => void;
     setLanguage: (l: AppLanguage) => void;
     setNightMode: (m: NightMode) => void;
     setThemeId: (i: ThemeName) => void;
@@ -39,7 +40,7 @@ interface SettingsState {
 
 export const useSettingsStore = create<SettingsState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             language: getDeviceDefaultLanguage(),
             hasUserChosenLanguage: false,
             nightMode: 'system',
@@ -52,6 +53,15 @@ export const useSettingsStore = create<SettingsState>()(
             highContrast: false,
             largeTouch: false,
 
+            syncDeviceLanguageIfDefault: () => {
+                const state = get();
+                if (!state.hasUserChosenLanguage) {
+                    const devLang = getDeviceDefaultLanguage();
+                    if (devLang !== state.language) {
+                        set({ language: devLang });
+                    }
+                }
+            },
             setLanguage: (l) => set({ language: l, hasUserChosenLanguage: true }),
             setNightMode: (m) => set({ nightMode: m }),
             setThemeId: (i) => {

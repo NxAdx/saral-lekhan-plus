@@ -128,6 +128,7 @@ export function RootLayout(props: any) {
       if (nextAppState === 'background' || nextAppState === 'inactive') {
         useAuthStore.getState().lockApp();
       } else if (nextAppState === 'active') {
+        useSettingsStore.getState().syncDeviceLanguageIfDefault();
         useBackupStore.getState().checkAndRunAutoBackup().catch((e) => log.error('AutoBackup Foreground', e as any));
       }
     });

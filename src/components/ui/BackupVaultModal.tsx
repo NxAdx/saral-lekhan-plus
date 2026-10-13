@@ -189,7 +189,7 @@ export const BackupVaultModal: React.FC<BackupVaultModalProps> = ({
                       onPress={() => setConfirmRestoreFile(item.filename)}
                     >
                       <Text style={{ color: colors.accent, fontFamily: font.sansBold, fontSize: 12 }}>
-                        {loc.settingsScreen?.restore || 'Restore'}
+                        {loc.restore || 'Restore'}
                       </Text>
                     </Pressable>
 

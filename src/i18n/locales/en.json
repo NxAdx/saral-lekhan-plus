@@ -152,7 +152,7 @@
         "backupSuccess": "Backup created successfully!",
         "backupNow": "Backup Now",
         "creatingBackup": "Backing up...",
-        "backupHistoryBtn": "Backup Vault & History",
+        "backupHistoryBtn": "Vault & History",
         "lastAutoBackup": "Last Backup",
         "never": "Never",
         "restoreSuccess": "Backup restored successfully!"
