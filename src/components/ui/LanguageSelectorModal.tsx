@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import { Modal, View, Text, StyleSheet, Pressable, ScrollView, Platform } from 'react-native';
 import { Svg, Path } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../store/themeStore';
@@ -73,6 +73,11 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
           <ScrollView style={styles.list} contentContainerStyle={styles.listContent} showsVerticalScrollIndicator={false}>
             {SUPPORTED_LANGUAGES.map((lang) => {
               const isSelected = currentLanguage === lang.id;
+              // Determine script-specific font family for the native name so it never renders under wrong font bounding box
+              const nativeFontFamily = (Platform.OS === 'android' && (lang.id === 'Bn' || lang.id === 'Te' || lang.id === 'Ta'))
+                ? 'sans-serif-medium'
+                : font.sansBold;
+
               return (
                 <Pressable
                   key={lang.id}
@@ -96,7 +101,9 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                         styles.nativeName,
                         {
                           color: isSelected ? colors.accent : colors.ink,
-                          fontFamily: font.sansBold,
+                          fontFamily: nativeFontFamily,
+                          fontSize: lang.id === 'En' ? 16 : 15,
+                          lineHeight: lang.id === 'En' ? 24 : 26,
                         },
                       ]}
                       numberOfLines={1}
@@ -215,7 +222,7 @@ const styles = StyleSheet.create({
   },
   nativeName: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 26,
     paddingVertical: 1,
   },
   englishName: {

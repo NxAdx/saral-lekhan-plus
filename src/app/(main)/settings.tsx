@@ -289,7 +289,7 @@ export default function SettingsScreen() {
             borderBottomColor: colors.strokeDim,
         },
         backBtn: { width: 38, height: 38, borderRadius: 99, borderWidth: 1.5, borderColor: colors.stroke, backgroundColor: colors.bgRaised, justifyContent: 'center', alignItems: 'center', marginRight: 16, ...theme.shadow.gentle },
-        title: { fontFamily: font.sansBold, fontSize: 22, color: colors.ink },
+        title: { fontFamily: font.sansBold, fontSize: settings.language === 'En' ? 22 : 20, lineHeight: 28, color: colors.ink },
         content: { padding: 20, paddingBottom: 100 },
 
         sectionTitle: {

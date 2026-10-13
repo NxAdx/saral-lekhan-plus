@@ -295,8 +295,8 @@ export default function HomeScreen() {
       ...type.headlineLarge,
       fontFamily: font.sansBold,
       color: colors.ink,
-      fontSize: 24,
-      lineHeight: 30,
+      fontSize: lang === 'En' ? 24 : 20,
+      lineHeight: lang === 'En' ? 30 : 28,
     },
     selectionActions: {
       flexDirection: 'row',
@@ -412,7 +412,9 @@ export default function HomeScreen() {
                 <Path d="M6 6l12 12" />
               </Svg>
             </Pressable>
-            <Text style={s.selectionTitle}>{selectedIds.size} {loc.home.selected || 'Selected'}</Text>
+            <Text style={s.selectionTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {selectedIds.size} {loc.home.selected || 'Selected'}
+            </Text>
             <View style={{ flex: 1 }} />
             <Pressable onPress={toggleSelectAll} style={s.textBtn} hitSlop={theme.hitSlop}>
               <Text style={s.textBtnLabel}>
