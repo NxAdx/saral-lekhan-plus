@@ -24,6 +24,8 @@ import { APP_VERSION, checkForUpdate, downloadAndInstallApk, UpdateInfo, UPDATER
 import * as Haptics from 'expo-haptics';
 import { useToastStore } from '../../store/toastStore';
 import { WebShareModal } from '../../components/ui/WebShareModal';
+import { useBackupStore, AutoBackupInterval } from '../../store/backupStore';
+import { BackupVaultModal } from '../../components/ui/BackupVaultModal';
 
 const STANDARD_THEMES: { id: ThemeName; label: string }[] = [
     { id: 'classic', label: 'Tippani' },
@@ -64,6 +66,8 @@ export default function SettingsScreen() {
     const [syncAlert, setSyncAlert] = React.useState<{ visible: boolean, title: string, sub: string }>({ visible: false, title: '', sub: '' });
     const [updateModal, setUpdateModal] = React.useState<{ visible: boolean, title: string, sub: string, info: UpdateInfo | null }>({ visible: false, title: '', sub: '', info: null });
     const [showWebShareModal, setShowWebShareModal] = React.useState(false);
+    const backupStore = useBackupStore();
+    const [showBackupVaultModal, setShowBackupVaultModal] = React.useState(false);
 
     const currentLangOption = useMemo(() => {
         return SUPPORTED_LANGUAGES.find(l => l.id === settings.language) || SUPPORTED_LANGUAGES[0];
@@ -841,7 +845,126 @@ export default function SettingsScreen() {
                         </View>
                     </View>
 
-                    {/* Local Backup Vault & Donations */}
+                    {/* Automated Backups & Vault Card */}
+                    <View style={s.listItem}>
+                        <View style={s.listContent}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Text style={s.listLabel}>{loc.settingsScreen.autoBackupTitle || 'Automated Backups'}</Text>
+                                {backupStore.autoBackupInterval !== 'off' && (
+                                    <View style={{ paddingHorizontal: 8, paddingVertical: 2, backgroundColor: colors.accentBg, borderRadius: theme.radius.pill }}>
+                                        <Text style={{ fontFamily: font.sansBold, fontSize: 11, color: colors.accent }}>
+                                            {backupStore.autoBackupInterval === 'daily'
+                                                ? (loc.settingsScreen.backupIntervalDaily || 'Daily')
+                                                : backupStore.autoBackupInterval === 'two_days'
+                                                ? (loc.settingsScreen.backupIntervalTwoDays || '2 Days')
+                                                : (loc.settingsScreen.backupIntervalWeekly || 'Weekly')}
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
+                            <Text style={s.listSub}>{loc.settingsScreen.autoBackupSub || 'Automatic snapshots rotated safely to local storage'}</Text>
+
+                            {/* Interval Selector Pills */}
+                            <View style={{ flexDirection: 'row', gap: 6, marginTop: 12, backgroundColor: colors.bg, padding: 4, borderRadius: theme.radius.md, borderWidth: 1, borderColor: colors.strokeDim }}>
+                                {(
+                                    [
+                                        { key: 'daily', label: loc.settingsScreen.backupIntervalDaily || 'Daily' },
+                                        { key: 'two_days', label: loc.settingsScreen.backupIntervalTwoDays || '2 Days' },
+                                        { key: 'weekly', label: loc.settingsScreen.backupIntervalWeekly || 'Weekly' },
+                                        { key: 'off', label: loc.settingsScreen.backupIntervalOff || 'Off' },
+                                    ] as const
+                                ).map((item) => {
+                                    const active = backupStore.autoBackupInterval === item.key;
+                                    return (
+                                        <Pressable
+                                            key={item.key}
+                                            onPress={() => {
+                                                Haptics.selectionAsync();
+                                                backupStore.setAutoBackupInterval(item.key as AutoBackupInterval);
+                                            }}
+                                            style={{
+                                                flex: 1,
+                                                paddingVertical: 7,
+                                                borderRadius: theme.radius.sm,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: active ? colors.accent : 'transparent',
+                                            }}
+                                        >
+                                            <Text
+                                                numberOfLines={1}
+                                                style={{
+                                                    fontSize: 12,
+                                                    fontFamily: active ? font.sansBold : font.sansMed,
+                                                    color: active ? colors.white : colors.inkMid,
+                                                }}
+                                            >
+                                                {item.label}
+                                            </Text>
+                                        </Pressable>
+                                    );
+                                })}
+                            </View>
+
+                            {/* Last Backup timestamp & quick status */}
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                                <Text style={{ fontFamily: font.sans, fontSize: 12, color: colors.inkDim }}>
+                                    {loc.settingsScreen.lastAutoBackup || 'Last Backup'}: {backupStore.lastAutoBackupTime ? new Date(backupStore.lastAutoBackupTime).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : (loc.settingsScreen.never || 'Never')}
+                                </Text>
+                            </View>
+
+                            {/* Action Buttons: Backup Now & History Vault */}
+                            <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                                <Pressable
+                                    disabled={backupStore.isBackingUp}
+                                    style={{
+                                        flex: 1,
+                                        paddingVertical: 10,
+                                        backgroundColor: colors.accent,
+                                        borderRadius: theme.radius.md,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                    onPress={async () => {
+                                        Haptics.selectionAsync();
+                                        const res = await backupStore.createManualBackup();
+                                        if (res.success) {
+                                            useToastStore.getState().showToast(loc.settingsScreen.backupSuccess || 'Backup created!', 'success');
+                                        } else {
+                                            useToastStore.getState().showToast(res.error || 'Backup failed', 'error');
+                                        }
+                                    }}
+                                >
+                                    <Text style={{ fontFamily: font.sansBold, color: colors.white, fontSize: 13 }}>
+                                        {backupStore.isBackingUp ? (loc.settingsScreen.creatingBackup || 'Backing up...') : (loc.settingsScreen.backupNow || 'Backup Now')}
+                                    </Text>
+                                </Pressable>
+
+                                <Pressable
+                                    style={{
+                                        flex: 1,
+                                        paddingVertical: 10,
+                                        backgroundColor: colors.bgRaised,
+                                        borderWidth: 1,
+                                        borderColor: colors.strokeDim,
+                                        borderRadius: theme.radius.md,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                    onPress={() => {
+                                        Haptics.selectionAsync();
+                                        setShowBackupVaultModal(true);
+                                    }}
+                                >
+                                    <Text style={{ fontFamily: font.sansSemi, color: colors.ink, fontSize: 13 }}>
+                                        {loc.settingsScreen.backupHistoryBtn || 'Backup Vault & History'}
+                                    </Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Manual File Export/Import & Donations */}
                     <View style={[s.listItem, s.listItemNoBorder]}>
                         <View style={s.listContent}>
                             <Text style={s.listLabel}>{loc.settingsScreen.dataVault}</Text>
@@ -1059,6 +1182,11 @@ export default function SettingsScreen() {
                 currentLanguage={settings.language}
                 onSelectLanguage={(lang) => settings.setLanguage(lang)}
                 onClose={() => setShowLanguageModal(false)}
+            />
+            <BackupVaultModal
+                visible={showBackupVaultModal}
+                onClose={() => setShowBackupVaultModal(false)}
+                onShowToast={(msg, type) => useToastStore.getState().showToast(msg, type || 'info')}
             />
         </View>
     );

@@ -34,6 +34,7 @@ import { themes } from '../tokens';
 import { useFonts } from '@expo-google-fonts/hind';
 import { useAiStore } from '../store/aiStore';
 import { useNotesStore } from '../store/notesStore';
+import { useBackupStore } from '../store/backupStore';
 import { useRuntimeUxFlagsStore } from '../store/runtimeUxFlagsStore';
 import { log } from '../utils/Logger';
 import { shallow } from 'zustand/shallow';
@@ -118,6 +119,7 @@ export function RootLayout(props: any) {
       setTimeout(() => {
         useAuthStore.getState().initialize().catch(() => {});
         useAiStore.getState().initialize().catch(() => {});
+        useBackupStore.getState().checkAndRunAutoBackup().catch((e) => log.error('AutoBackup Init', e as any));
       }, 0);
     };
     init();
@@ -125,6 +127,8 @@ export function RootLayout(props: any) {
     const subscription = AppState.addEventListener('change', (nextAppState) => {
       if (nextAppState === 'background' || nextAppState === 'inactive') {
         useAuthStore.getState().lockApp();
+      } else if (nextAppState === 'active') {
+        useBackupStore.getState().checkAndRunAutoBackup().catch((e) => log.error('AutoBackup Foreground', e as any));
       }
     });
 
