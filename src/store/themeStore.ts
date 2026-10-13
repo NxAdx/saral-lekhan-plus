@@ -97,12 +97,12 @@ export const useTheme = () => {
         ...sharedTokens,
         font: fontSet as any,
         isDark,
-        fontSize: language === 'En' ? 1.0 : 0.95,
+        fontSize: 1.0,
         hitSlop: {
             top: largeTouch ? 14 : 8,
             bottom: largeTouch ? 14 : 8,
             left: largeTouch ? 4 : 2,
             right: largeTouch ? 4 : 2,
         },
-    }), [colors, fontSet, isDark, largeTouch, language]);
+    }), [colors, fontSet, isDark, largeTouch]);
 };

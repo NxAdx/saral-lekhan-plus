@@ -295,8 +295,8 @@ export default function HomeScreen() {
       ...type.headlineLarge,
       fontFamily: font.sansBold,
       color: colors.ink,
-      fontSize: lang === 'En' ? 24 : 20,
-      lineHeight: lang === 'En' ? 30 : 28,
+      fontSize: 24,
+      lineHeight: 30,
     },
     selectionActions: {
       flexDirection: 'row',

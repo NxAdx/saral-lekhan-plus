@@ -610,7 +610,7 @@ export default function EditNoteScreen() {
     doneBtnActive: { transform: [{ translateY: 2 }], shadowOffset: { width: 0, height: 1 }, elevation: 1 },
     doneBtnText: {
       fontFamily: font.sansBold,
-      fontSize: settings.language === 'En' ? 13 : 12,
+      fontSize: 13,
       color: colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',

@@ -102,8 +102,8 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                         {
                           color: isSelected ? colors.accent : colors.ink,
                           fontFamily: nativeFontFamily,
-                          fontSize: lang.id === 'En' ? 16 : 15,
-                          lineHeight: lang.id === 'En' ? 24 : 26,
+                          fontSize: 16,
+                          lineHeight: 26,
                         },
                       ]}
                       numberOfLines={1}

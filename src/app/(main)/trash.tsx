@@ -61,8 +61,8 @@ export default function TrashScreen() {
         backBtn: { marginRight: 16, padding: 4 },
         title: {
             fontFamily: font.sansBold,
-            fontSize: 22 * theme.fontSize,
-            lineHeight: Math.round(22 * theme.fontSize * (lang === 'En' ? 1.3 : 1.48)),
+            fontSize: 22,
+            lineHeight: 28,
             color: colors.ink,
             flex: 1,
             marginRight: 8,
