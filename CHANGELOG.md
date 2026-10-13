@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.19.30 - Multilingual Typography & Native Indic Font Engine
+- **Dedicated Native Google Noto Fonts**: Embedded full Google Noto Sans fonts for Telugu (`NotoSansTelugu`), Tamil (`NotoSansTamil`), and Bengali (`NotoSansBengali`) directly into `android/app/src/main/assets/fonts/` with dedicated Regular, SemiBold, and Bold weights. Resolved ReactFontManager native fallback to thin system fonts.
+- **Diacritic & Matra Envelope Safety**: Enhanced line heights (1.55x - 1.65x) and eliminated artificial font padding reduction to prevent top and bottom clipping of complex vowel signs and subjoined conjuncts.
+- **Multilingual Layout Hardening**: Stabilized settings screen flexbox layouts, anchored twin action buttons, tightened segment pills, and balanced search inputs across all 6 supported locales.
+- **Localization Polish**: Added native auto-save labels for Bengali and unified print actions across all regional languages.
+
 ## v2.19.29 - Web Share Studio Print & Document Export
 - **Note Printing & PDF Export (`🖨️ Print` & Ctrl+P)**: Added an intuitive Print button to the editor top action bar and keyboard shortcut (`Ctrl+P` / `Cmd+P`). Automatically switches from source to visual mode before printing so markdown renders as clean, formatted rich text.
 - **Dedicated Print Typography (`@media print`)**: Engineered clean, ink-efficient print styles that hide web chrome (sidebar, topbars, editing toolbars, trash banners, and toasts), preserve document pagination (`page-break-inside: avoid` for code and blockquotes), and render high-contrast black text on pure white paper with formatted title, tag, and body.

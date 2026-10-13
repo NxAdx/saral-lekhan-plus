@@ -16,6 +16,7 @@
     "deleteForever": "চিরতরে মুছে ফেলুন",
     "exportOptions": "Share / Export",
     "exportPdf": "PDF হিসেবে সংরক্ষণ করুন",
+    "print": "প্রিন্ট",
     "exportImg": "ছবি হিসেবে সংরক্ষণ করুন",
     "editor": {
         "titlePlaceholder": "শিরোনাম...",
@@ -81,6 +82,7 @@
         "system": "সিস্টেম",
         "light": "লাইট",
         "dark": "ডার্ক",
+        "autoSave": "নোট স্বয়ংক্রিয়ভাবে সেভ করুন",
         "autoSaveSub": "আপনি টাইপ করার সাথে সাথে স্বয়ংক্রিয়ভাবে নোট সেভ করুন",
         "highContrast": "হাই কন্ট্রাস্ট মোড",
         "highContrastSub": "পঠনযোগ্যতা উন্নত করতে টেক্সট ও লাইনের বৈসাদৃশ্য বাড়ায়।",
