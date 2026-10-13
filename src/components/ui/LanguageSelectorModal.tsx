@@ -142,9 +142,15 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                         styles.nativeName,
                         {
                           color: isSelected ? colors.accent : colors.ink,
-                          fontFamily: font.sansBold,
+                          fontFamily: lang.id === 'Te' 
+                            ? 'NotoSansTelugu-Bold' 
+                            : lang.id === 'Ta' 
+                            ? 'NotoSansTamil-Bold' 
+                            : lang.id === 'Bn' 
+                            ? 'NotoSansBengali-Bold' 
+                            : font.sansBold,
                           fontSize: 16,
-                          lineHeight: 24,
+                          lineHeight: 26,
                         },
                       ]}
                       numberOfLines={1}
@@ -157,6 +163,8 @@ export const LanguageSelectorModal: React.FC<LanguageSelectorModalProps> = ({
                         {
                           color: colors.inkDim,
                           fontFamily: font.sans,
+                          fontSize: 13,
+                          lineHeight: 18,
                         },
                       ]}
                       numberOfLines={1}

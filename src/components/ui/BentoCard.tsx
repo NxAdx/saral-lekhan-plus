@@ -55,13 +55,13 @@ export const BentoCard = React.memo(({
             color: (selected || pinned) ? colors.accent : colors.ink,
             marginBottom: 4,
             paddingVertical: 2,
-            lineHeight: Math.round(type.titleLarge.fontSize * 1.48),
+            lineHeight: type.titleLarge.lineHeight,
         },
         preview: {
             ...type.bodyLarge,
             fontFamily: font.sans,
             color: colors.inkMid,
-            lineHeight: Math.round(type.bodyLarge.fontSize * 1.50),
+            lineHeight: type.bodyLarge.lineHeight,
             opacity: 0.85,
         },
         metaRow: {
@@ -89,8 +89,8 @@ export const BentoCard = React.memo(({
             ...type.labelMedium,
             fontFamily: font.sansBold,
             color: colors.accent,
-            fontSize: Math.round(type.labelMedium.fontSize * 0.88),
-            lineHeight: Math.round(type.labelMedium.fontSize * 1.45),
+            fontSize: Math.max(11, Math.round(type.labelMedium.fontSize * 0.88)),
+            lineHeight: Math.round(type.labelMedium.lineHeight * 0.95),
             textAlignVertical: 'center',
         },
         selectionIcon: {

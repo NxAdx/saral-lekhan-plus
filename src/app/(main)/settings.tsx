@@ -293,13 +293,13 @@ export default function SettingsScreen() {
             borderBottomColor: colors.strokeDim,
         },
         backBtn: { width: 38, height: 38, borderRadius: 99, borderWidth: 1.5, borderColor: colors.stroke, backgroundColor: colors.bgRaised, justifyContent: 'center', alignItems: 'center', marginRight: 16, ...theme.shadow.gentle },
-        title: { fontFamily: font.sansBold, fontSize: 22, lineHeight: 28, color: colors.ink },
+        title: { fontFamily: font.sansBold, fontSize: 22, lineHeight: settings.language === 'En' ? 28 : 32, color: colors.ink },
         content: { padding: 20, paddingBottom: 100 },
 
         sectionTitle: {
             fontFamily: font.sansBold,
             fontSize: 13,
-            lineHeight: 20,
+            lineHeight: settings.language === 'En' ? 20 : 22,
             color: colors.accent,
             textTransform: settings.language !== 'En' ? 'none' : 'uppercase',
             marginBottom: 12,
@@ -332,7 +332,7 @@ export default function SettingsScreen() {
         listLabel: {
             fontFamily: font.sansBold,
             fontSize: type.titleLarge.fontSize - 2,
-            lineHeight: Math.round((type.titleLarge.fontSize - 2) * 1.45),
+            lineHeight: Math.round((type.titleLarge.fontSize - 2) * (settings.language === 'En' ? 1.45 : 1.55)),
             color: colors.ink,
             marginBottom: 2,
             flexShrink: 1,
@@ -341,7 +341,7 @@ export default function SettingsScreen() {
         listSub: {
             ...type.labelMedium,
             fontFamily: font.sans,
-            lineHeight: Math.round(type.labelMedium.fontSize * 1.45),
+            lineHeight: type.labelMedium.lineHeight,
             color: colors.inkMid,
             flexShrink: 1,
         },
@@ -361,7 +361,7 @@ export default function SettingsScreen() {
         modeText: {
             fontFamily: font.sansSemi,
             fontSize: 13,
-            lineHeight: 20,
+            lineHeight: 22,
             textAlign: 'center',
             textAlignVertical: 'center',
             paddingHorizontal: 2,

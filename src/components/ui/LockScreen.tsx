@@ -104,7 +104,7 @@ export function LockScreen() {
                     style={{
                         fontFamily: lang === 'En' ? font.display : font.sansBold,
                         fontSize: 26,
-                        lineHeight: 34,
+                        lineHeight: 38,
                         color: colors.ink,
                         marginBottom: 8,
                         textAlign: 'center',

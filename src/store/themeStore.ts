@@ -35,14 +35,45 @@ const HIND_FONT_SET = {
     branding: 'Hind-Bold',
 };
 
+const TELUGU_FONT_SET = {
+    sans: 'NotoSansTelugu-Regular',
+    sansMed: 'NotoSansTelugu-SemiBold',
+    sansSemi: 'NotoSansTelugu-SemiBold',
+    sansBold: 'NotoSansTelugu-Bold',
+    display: 'NotoSansTelugu-Bold',
+    mono: 'DMMono-Regular',
+    branding: 'NotoSansTelugu-Bold',
+};
+
+const TAMIL_FONT_SET = {
+    sans: 'NotoSansTamil-Regular',
+    sansMed: 'NotoSansTamil-SemiBold',
+    sansSemi: 'NotoSansTamil-SemiBold',
+    sansBold: 'NotoSansTamil-Bold',
+    display: 'NotoSansTamil-Bold',
+    mono: 'DMMono-Regular',
+    branding: 'NotoSansTamil-Bold',
+};
+
+const BENGALI_FONT_SET = {
+    sans: 'NotoSansBengali-Regular',
+    sansMed: 'NotoSansBengali-SemiBold',
+    sansSemi: 'NotoSansBengali-SemiBold',
+    sansBold: 'NotoSansBengali-Bold',
+    display: 'NotoSansBengali-Bold',
+    mono: 'DMMono-Regular',
+    branding: 'NotoSansBengali-Bold',
+};
+
 export const useTheme = () => {
     const systemColorScheme = useColorScheme();
-    const { nightMode, themeId, highContrast, largeTouch } = useSettingsStore(
+    const { nightMode, themeId, highContrast, largeTouch, language } = useSettingsStore(
         (s) => ({
             nightMode: s.nightMode,
             themeId: s.themeId,
             highContrast: s.highContrast,
             largeTouch: s.largeTouch,
+            language: s.language,
         }),
         shallow
     );
@@ -69,11 +100,25 @@ export const useTheme = () => {
     }, [themeId, isDark, highContrast]);
 
     // PERMANENT DIRECTIVE: English fonts must strictly use Hind typeface family at 1.0x scale.
-    // Locking font tokens to HIND_FONT_SET eliminates all layout and screen jumps when switching languages.
+    // Dedicated Google Noto Sans fonts for Telugu, Tamil, and Bengali eliminate all matra clipping and missing weights.
+    const fontSet = useMemo(() => {
+        if (language === 'Te') {
+            return TELUGU_FONT_SET;
+        }
+        if (language === 'Ta') {
+            return TAMIL_FONT_SET;
+        }
+        if (language === 'Bn') {
+            return BENGALI_FONT_SET;
+        }
+        // English (En), Hindi (Hi), and Marathi (Mr) use Hind
+        return HIND_FONT_SET;
+    }, [language]);
+
     return useMemo<ThemeValue>(() => ({
         colors,
         ...sharedTokens,
-        font: HIND_FONT_SET as any,
+        font: fontSet as any,
         isDark,
         fontSize: 1.0,
         hitSlop: {
@@ -82,5 +127,5 @@ export const useTheme = () => {
             left: largeTouch ? 4 : 2,
             right: largeTouch ? 4 : 2,
         },
-    }), [colors, isDark, largeTouch]);
+    }), [colors, fontSet, isDark, largeTouch]);
 };

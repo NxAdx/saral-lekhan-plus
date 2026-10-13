@@ -86,6 +86,15 @@ export function RootLayout(props: any) {
     'Hind-Bold': require('../../assets/fonts/Hind-Bold.ttf'),
     'VesperLibre-Black': require('../../assets/fonts/VesperLibre-Black.ttf'),
     'DMMono-Regular': require('../../assets/fonts/DMMono-Regular.ttf'),
+    'NotoSansTelugu-Regular': require('../../assets/fonts/NotoSansTelugu-Regular.ttf'),
+    'NotoSansTelugu-SemiBold': require('../../assets/fonts/NotoSansTelugu-SemiBold.ttf'),
+    'NotoSansTelugu-Bold': require('../../assets/fonts/NotoSansTelugu-Bold.ttf'),
+    'NotoSansTamil-Regular': require('../../assets/fonts/NotoSansTamil-Regular.ttf'),
+    'NotoSansTamil-SemiBold': require('../../assets/fonts/NotoSansTamil-SemiBold.ttf'),
+    'NotoSansTamil-Bold': require('../../assets/fonts/NotoSansTamil-Bold.ttf'),
+    'NotoSansBengali-Regular': require('../../assets/fonts/NotoSansBengali-Regular.ttf'),
+    'NotoSansBengali-SemiBold': require('../../assets/fonts/NotoSansBengali-SemiBold.ttf'),
+    'NotoSansBengali-Bold': require('../../assets/fonts/NotoSansBengali-Bold.ttf'),
   });
 
   const isDark = nightMode === 'dark' || (nightMode === 'system' && systemColor === 'dark');

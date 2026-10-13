@@ -490,7 +490,6 @@ export default function NewNoteScreen() {
       color: colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
-      includeFontPadding: false,
     },
 
     editorFrame: { flex: 1 },
@@ -508,8 +507,8 @@ export default function NewNoteScreen() {
       fontWeight: '700',
       color: colors.ink,
       padding: 0,
-      lineHeight: 30,
-      minHeight: 36,
+      lineHeight: 34,
+      minHeight: 40,
     },
     editorViewport: { flex: 1 },
     editorScroll: { flex: 1 },

@@ -45,7 +45,7 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
             color: active ? colors.white : colors.inkMid,
             fontFamily: font.sansSemi,
             fontSize: 12,
-            lineHeight: 20,
+            lineHeight: 22,
             textAlignVertical: 'center',
           },
         ]}
@@ -59,7 +59,7 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
 
 const styles = StyleSheet.create({
   pill: {
-    minHeight: 34,
+    minHeight: 36,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderWidth: 1.5,

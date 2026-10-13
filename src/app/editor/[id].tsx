@@ -614,7 +614,6 @@ export default function EditNoteScreen() {
       color: colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
-      includeFontPadding: false,
     },
     exportBtnText: { color: colors.white }, // High contrast for share/export
 
@@ -633,8 +632,8 @@ export default function EditNoteScreen() {
       fontWeight: '700',
       color: colors.ink,
       padding: 0,
-      lineHeight: 30,
-      minHeight: 36,
+      lineHeight: 34,
+      minHeight: 40,
     },
     editorViewport: { flex: 1 },
     editorScroll: { flex: 1 },

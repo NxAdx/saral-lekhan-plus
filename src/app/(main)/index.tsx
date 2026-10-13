@@ -296,7 +296,7 @@ export default function HomeScreen() {
       fontFamily: font.sansBold,
       color: colors.ink,
       fontSize: 24,
-      lineHeight: 30,
+      lineHeight: lang !== 'En' ? 34 : 30,
     },
     selectionActions: {
       flexDirection: 'row',
