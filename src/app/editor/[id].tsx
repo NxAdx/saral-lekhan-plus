@@ -614,7 +614,7 @@ export default function EditNoteScreen() {
       color: colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
-      includeFontPadding: settings.language === 'En' ? false : true,
+      includeFontPadding: false,
     },
     exportBtnText: { color: colors.white }, // High contrast for share/export
 
@@ -774,9 +774,6 @@ export default function EditNoteScreen() {
             <Text
               style={s.doneBtnText}
               numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.75}
-              maxFontSizeMultiplier={1.2}
             >
               {loc.editor.done}
             </Text>

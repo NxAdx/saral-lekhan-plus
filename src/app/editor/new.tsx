@@ -490,7 +490,7 @@ export default function NewNoteScreen() {
       color: colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
-      includeFontPadding: settings.language === 'En' ? false : true,
+      includeFontPadding: false,
     },
 
     editorFrame: { flex: 1 },
@@ -624,9 +624,6 @@ export default function NewNoteScreen() {
             <Text
               style={s.doneBtnText}
               numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.75}
-              maxFontSizeMultiplier={1.2}
             >
               {loc.editor.done}
             </Text>

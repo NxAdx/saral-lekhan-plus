@@ -560,9 +560,6 @@ export default function SettingsScreen() {
                             >
                                 <Text
                                     numberOfLines={1}
-                                    adjustsFontSizeToFit={true}
-                                    minimumFontScale={0.75}
-                                    maxFontSizeMultiplier={1.2}
                                     style={[s.modeText, { color: settings.nightMode === m ? (theme.isDark ? colors.bg : colors.white) : colors.inkMid }]}
                                 >
                                     {m === 'system' ? loc.settingsScreen.system : m === 'light' ? loc.settingsScreen.light : loc.settingsScreen.dark}
@@ -738,8 +735,8 @@ export default function SettingsScreen() {
                                 </Svg>
                             </View>
                             <View style={s.listContent}>
-                                <Text style={s.listLabel} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{loc.settingsScreen.displayLanguage}</Text>
-                                <Text style={s.listSub} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
+                                <Text style={s.listLabel} numberOfLines={1}>{loc.settingsScreen.displayLanguage}</Text>
+                                <Text style={s.listSub} numberOfLines={1}>{loc.settingsScreen?.displayLanguageSub || 'Choose your preferred language'}</Text>
                             </View>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>

@@ -412,7 +412,7 @@ export default function HomeScreen() {
                 <Path d="M6 6l12 12" />
               </Svg>
             </Pressable>
-            <Text style={s.selectionTitle} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+            <Text style={s.selectionTitle} numberOfLines={1}>
               {selectedIds.size} {loc.home.selected || 'Selected'}
             </Text>
             <View style={{ flex: 1 }} />
@@ -434,9 +434,6 @@ export default function HomeScreen() {
               <Text
                 style={s.appSub}
                 numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}
-                maxFontSizeMultiplier={1.2}
               >
                 {loc.appSub || "NOTES EXPERIENCE"}
               </Text>
@@ -484,9 +481,6 @@ export default function HomeScreen() {
             <Text
               style={s.deleteBtnLabel}
               numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.8}
-              maxFontSizeMultiplier={1.2}
             >
               {loc.editor.delete || 'Delete'} ({selectedIds.size})
             </Text>
@@ -500,9 +494,6 @@ export default function HomeScreen() {
             <Text
               style={s.exportBtnLabel}
               numberOfLines={1}
-              adjustsFontSizeToFit={true}
-              minimumFontScale={0.8}
-              maxFontSizeMultiplier={1.2}
             >
               {loc.home.export || 'Export'}
             </Text>

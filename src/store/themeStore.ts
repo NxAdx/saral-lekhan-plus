@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 import { shallow } from 'zustand/shallow';
 import { sharedTokens, themes } from '../tokens';
-import { useSettingsStore, AppLanguage } from './settingsStore';
+import { useSettingsStore } from './settingsStore';
 
 type ThemeValue = {
     colors: (typeof themes)[keyof typeof themes]['light'];
@@ -35,27 +35,14 @@ const HIND_FONT_SET = {
     branding: 'Hind-Bold',
 };
 
-// For scripts not in Hind (Bengali, Telugu, Tamil), use calibrated system fonts
-// which carry native ascent/descent metrics for zero matra/halant clipping.
-const SYSTEM_INDIC_FONT_SET = {
-    sans: Platform.OS === 'android' ? 'sans-serif' : 'System',
-    sansMed: Platform.OS === 'android' ? 'sans-serif-medium' : 'System',
-    sansSemi: Platform.OS === 'android' ? 'sans-serif-medium' : 'System',
-    sansBold: Platform.OS === 'android' ? 'sans-serif-medium' : 'System',
-    display: Platform.OS === 'android' ? 'sans-serif-medium' : 'System',
-    mono: Platform.OS === 'android' ? 'monospace' : 'Courier',
-    branding: Platform.OS === 'android' ? 'sans-serif-medium' : 'System',
-};
-
 export const useTheme = () => {
     const systemColorScheme = useColorScheme();
-    const { nightMode, themeId, highContrast, largeTouch, language } = useSettingsStore(
+    const { nightMode, themeId, highContrast, largeTouch } = useSettingsStore(
         (s) => ({
             nightMode: s.nightMode,
             themeId: s.themeId,
             highContrast: s.highContrast,
             largeTouch: s.largeTouch,
-            language: s.language,
         }),
         shallow
     );
@@ -81,21 +68,12 @@ export const useTheme = () => {
         return c;
     }, [themeId, isDark, highContrast]);
 
-    // Script-aware typography selection
-    const fontSet = useMemo(() => {
-        // PERMANENT DIRECTIVE: English fonts must strictly use Hind typeface family at 1.0x scale.
-        // Hindi (Hi) and Marathi (Mr) are Devanagari, natively supported with full fidelity by Hind.
-        if (language === 'En' || language === 'Hi' || language === 'Mr') {
-            return HIND_FONT_SET;
-        }
-        // Bengali (Bn), Telugu (Te), and Tamil (Ta) use system Indic font mapping to eliminate clipping.
-        return SYSTEM_INDIC_FONT_SET;
-    }, [language]);
-
+    // PERMANENT DIRECTIVE: English fonts must strictly use Hind typeface family at 1.0x scale.
+    // Locking font tokens to HIND_FONT_SET eliminates all layout and screen jumps when switching languages.
     return useMemo<ThemeValue>(() => ({
         colors,
         ...sharedTokens,
-        font: fontSet as any,
+        font: HIND_FONT_SET as any,
         isDark,
         fontSize: 1.0,
         hitSlop: {
@@ -104,5 +82,5 @@ export const useTheme = () => {
             left: largeTouch ? 4 : 2,
             right: largeTouch ? 4 : 2,
         },
-    }), [colors, fontSet, isDark, largeTouch]);
+    }), [colors, isDark, largeTouch]);
 };

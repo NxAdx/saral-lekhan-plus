@@ -136,7 +136,7 @@
         "autoBackupSub": "உள்ளூர் சேமிப்பகத்தில் பாதுகாப்பாக தானியங்கி ஸ்னாப்ஷாட்கள்",
         "backupIntervalDaily": "தினசரி",
         "backupIntervalTwoDays": "2 நாட்கள்",
-        "backupIntervalWeekly": "வாராந்திர",
+        "backupIntervalWeekly": "வாரம்",
         "backupIntervalOff": "முடக்கு",
         "backupVaultTitle": "காப்புப்பிரதி பெட்டக வரலாறு",
         "backupVaultDesc": "சாதனத்தில் அதிகபட்சம் 5 தானியங்கி ஸ்னாப்ஷாட்கள் சேமிக்கப்படும்",

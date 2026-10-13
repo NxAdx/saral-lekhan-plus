@@ -50,9 +50,6 @@ export function TagPill({ label, active, icon, onPress }: TagPillProps) {
           },
         ]}
         numberOfLines={1}
-        adjustsFontSizeToFit={true}
-        minimumFontScale={0.8}
-        maxFontSizeMultiplier={1.2}
       >
         {label}
       </Text>

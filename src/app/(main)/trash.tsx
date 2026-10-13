@@ -110,9 +110,6 @@ export default function TrashScreen() {
                 <Text
                     style={s.title}
                     numberOfLines={1}
-                    adjustsFontSizeToFit={true}
-                    minimumFontScale={0.8}
-                    maxFontSizeMultiplier={1.2}
                 >
                     {loc.trash}
                 </Text>
@@ -128,9 +125,6 @@ export default function TrashScreen() {
                         <Text
                             style={s.emptyAllText}
                             numberOfLines={1}
-                            adjustsFontSizeToFit={true}
-                            minimumFontScale={0.8}
-                            maxFontSizeMultiplier={1.2}
                         >
                             {loc.emptyAll || 'Empty All'}
                         </Text>
