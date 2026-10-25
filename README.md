@@ -51,7 +51,6 @@
 | Source | Link |
 |--------|------|
 | GitHub Releases | [Download Latest APK](https://github.com/NxAdx/saral-lekhan-plus/releases/latest) |
-| F-Droid | Submission update in progress |
 
 ## Build from Source
 
@@ -66,11 +65,8 @@ npm ci --legacy-peer-deps
 # Start development server
 npm run start
 
-# Build the direct GitHub/Play release artifacts
+# Build the direct release artifacts
 npm run build:android:direct
-
-# Build the F-Droid flavor
-npm run build:android:fdroid
 ```
 
 Requirements: Node.js 18+, Java 17, Android SDK 34
@@ -82,7 +78,7 @@ Requirements: Node.js 18+, Java 17, Android SDK 34
 - State: Zustand
 - Database: expo-sqlite
 - AI: Google Gemini API (user-provided key)
-- Build: Committed native Android project with direct + F-Droid flavors
+- Build: Committed native Android project with direct release build
 - **AI-Enhanced Development**:
   - Agent Skills: Integrated official Android modular skills for Compose, AGP, and R8.
   - Automation: Powered by the Google Android CLI.
@@ -96,7 +92,7 @@ Requirements: Node.js 18+, Java 17, Android SDK 34
 - All data stored locally on-device
 - Optional biometric authentication
 - Spark AI is optional and only connects to Gemini after you add your own API key
-- The F-Droid build disables the in-app updater, Expo OTA URL, and startup runtime-flag fetches
+- Direct release builds disable telemetry, Expo OTA URL, and startup runtime-flag fetches
 
 ## Contributing
 
