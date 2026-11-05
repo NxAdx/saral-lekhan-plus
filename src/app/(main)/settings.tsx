@@ -28,6 +28,7 @@ import { useBackupStore, AutoBackupInterval } from '../../store/backupStore';
 import { BackupVaultModal } from '../../components/ui/BackupVaultModal';
 
 const STANDARD_THEMES: { id: ThemeName; label: string }[] = [
+    { id: 'mononote', label: 'Mononote' },
     { id: 'classic', label: 'Tippani' },
     { id: 'nord', label: 'Nordic' }
 ];
@@ -587,37 +588,6 @@ export default function SettingsScreen() {
                             trackColor={{ false: colors.stroke, true: colors.accent }}
                             thumbColor={colors.white}
                         />
-                    </View>
-
-                    {/* Default Editor Experience (Minimalist vs Rich) */}
-                    <View style={s.listItem}>
-                        <View style={s.listContent}>
-                            <Text style={s.listLabel}>Default Editor Mode</Text>
-                            <Text style={s.listSub}>Choose between Mononote minimalist card or full rich text toolbar.</Text>
-                        </View>
-                    </View>
-                    <View style={{ flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.strokeDim }}>
-                        {(['minimalist', 'rich'] as const).map((mode, idx) => (
-                            <Pressable
-                                key={mode}
-                                onPress={() => {
-                                    Haptics.selectionAsync();
-                                    settings.setDefaultEditorMode(mode);
-                                }}
-                                style={[
-                                    s.modeBtn,
-                                    idx === 1 && s.modeBtnLast,
-                                    settings.defaultEditorMode === mode && s.activeMode
-                                ]}
-                            >
-                                <Text
-                                    numberOfLines={1}
-                                    style={[s.modeText, { color: settings.defaultEditorMode === mode ? (theme.isDark ? colors.bg : colors.white) : colors.inkMid }]}
-                                >
-                                    {mode === 'minimalist' ? 'Minimalist (Mononote)' : 'Rich Text'}
-                                </Text>
-                            </Pressable>
-                        ))}
                     </View>
                     
                     {/* High Contrast Toggle */}

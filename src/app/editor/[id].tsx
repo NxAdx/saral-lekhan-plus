@@ -35,8 +35,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRichEditorViewport } from '../../hooks/useRichEditorViewport';
 import { useFooterMeasurement } from '../../hooks/useFooterMeasurement';
 import { useToastStore } from '../../store/toastStore';
-import { MinimalistNoteEditor } from '../../components/ui/MinimalistNoteEditor';
-import { EditorMode } from '../../store/settingsStore';
 export default function EditNoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -55,7 +53,6 @@ export default function EditNoteScreen() {
 
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState('');
-  const [editorMode, setEditorMode] = useState<EditorMode>(settings.defaultEditorMode || 'minimalist');
   const [bodyText, setBodyText] = useState(''); // Text representation for word count
   const [editorOffset, setEditorOffset] = useState(0);
 
@@ -614,11 +611,11 @@ export default function EditNoteScreen() {
     doneBtnText: {
       fontFamily: font.sansBold,
       fontSize: 13,
-      color: colors.white,
+      color: theme.isDark ? colors.bg : colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
     },
-    exportBtnText: { color: colors.white }, // High contrast for share/export
+    exportBtnText: { color: theme.isDark ? colors.bg : colors.white }, // High contrast for share/export
 
     editorFrame: { flex: 1 },
     titleBox: {
@@ -726,37 +723,6 @@ export default function EditNoteScreen() {
   const dateStr = new Date(note?.updated_at || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }).toUpperCase();
   const wc = wordCount(bodyText);
 
-  if (editorMode === 'minimalist' && note) {
-    return (
-      <MinimalistNoteEditor
-        initialTitle={note.title}
-        initialBody={note.body}
-        isGlancePinned={!!note.is_glance}
-        onSave={({ title: finalTitle, body: finalBody, isGlance }) => {
-          updateNote(note.id, {
-            title: finalTitle,
-            body: finalBody,
-            is_glance: isGlance,
-          });
-
-          if (isGlance !== note.is_glance) {
-            useNotesStore.getState().setGlancePinnedNote(note.id, isGlance);
-          }
-
-          useToastStore.getState().show(isGlance ? '📌 Pinned to Lock Screen' : (loc.saved || 'Note Saved'));
-          router.back();
-        }}
-        onSwitchToRichMode={(currentTitle, currentBody) => {
-          setTitle(currentTitle);
-          setBodyText(currentBody);
-          richText.current?.setContentHTML(markdownToHtml(currentBody));
-          setEditorMode('rich');
-        }}
-        onBack={handleBack}
-      />
-    );
-  }
-
   return (
     <View style={s.root}>
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} />
@@ -782,14 +748,24 @@ export default function EditNoteScreen() {
 
         <View style={s.headerRight}>
           <Pressable
-            onPress={() => setEditorMode('minimalist')}
-            style={s.circleBtn}
+            onPress={() => {
+              if (note) {
+                const nextGlance = !note.is_glance;
+                updateNote(note.id, { is_glance: nextGlance });
+                useNotesStore.getState().setGlancePinnedNote(note.id, nextGlance);
+                useToastStore.getState().showToast(
+                  nextGlance ? '📌 Pinned to Glance lock screen' : 'Unpinned from Glance',
+                  'info'
+                );
+              }
+            }}
+            style={[s.circleBtn, note?.is_glance && { borderColor: colors.accent, backgroundColor: colors.accentBg }]}
             hitSlop={theme.hitSlop}
-            accessibilityLabel="Switch to Minimalist Mode"
+            accessibilityLabel={note?.is_glance ? 'Unpin from Glance lock screen' : 'Pin to Glance lock screen'}
           >
-            <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
-              <Rect x="4" y="4" width="16" height="16" rx="3" />
-              <Path d="M9 12h6" />
+            <Svg viewBox="0 0 24 24" width={20} height={20} fill={note?.is_glance ? colors.accent : "none"} stroke={note?.is_glance ? colors.accent : colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+              <Path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+              <Path d="M9 17v1a3 3 0 0 0 6 0v-1" />
             </Svg>
           </Pressable>
           <Pressable onPress={() => { if (note) updateNote(note.id, { pinned: !note.pinned }) }} style={[s.circleBtn, note?.pinned && { borderColor: colors.accent, backgroundColor: colors.accentBg }]} hitSlop={theme.hitSlop} accessibilityLabel={note?.pinned ? 'Unpin note' : 'Pin note'}>

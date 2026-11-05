@@ -29,8 +29,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRichEditorViewport } from '../../hooks/useRichEditorViewport';
 import { useFooterMeasurement } from '../../hooks/useFooterMeasurement';
 import { useToastStore } from '../../store/toastStore';
-import { MinimalistNoteEditor } from '../../components/ui/MinimalistNoteEditor';
-import { EditorMode } from '../../store/settingsStore';
 
 export default function NewNoteScreen() {
   const router = useRouter();
@@ -47,7 +45,7 @@ export default function NewNoteScreen() {
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState('');
   const [isPinned, setIsPinned] = useState(false);
-  const [editorMode, setEditorMode] = useState<EditorMode>(settings.defaultEditorMode || 'minimalist');
+  const [isGlance, setIsGlance] = useState(false);
   const [bodyText, setBodyText] = useState(''); // Text representation for word count
   const [editorOffset, setEditorOffset] = useState(0);
 
@@ -237,16 +235,20 @@ export default function NewNoteScreen() {
     const html = await richText.current?.getContentHtml();
     if (title.trim() || (html && html.trim())) {
       if (noteId.current) {
-        updateNote(noteId.current, { title: title.trim(), body: html || '', tag: tag.trim() });
+        updateNote(noteId.current, { title: title.trim(), body: html || '', tag: tag.trim(), is_glance: isGlance });
+        useNotesStore.getState().setGlancePinnedNote(noteId.current, isGlance);
       } else {
-        const id = addNote({ title: title.trim(), body: html || '', tag: tag.trim(), pinned: isPinned });
+        const id = addNote({ title: title.trim(), body: html || '', tag: tag.trim(), pinned: isPinned, is_glance: isGlance });
         noteId.current = id;
+        if (isGlance) {
+          useNotesStore.getState().setGlancePinnedNote(id, true);
+        }
       }
       setIsDirty(false);
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     useToastStore.getState().showToast(loc.editor?.savedSubtitle || 'Note saved', 'success');
-  }, [title, tag, bodyText, updateNote, addNote, loc]);
+  }, [title, tag, bodyText, isPinned, isGlance, updateNote, addNote, loc]);
 
   const handleDone = useCallback(async () => {
     Keyboard.dismiss();
@@ -490,7 +492,7 @@ export default function NewNoteScreen() {
     doneBtnText: {
       fontFamily: font.sansBold,
       fontSize: 13,
-      color: colors.white,
+      color: theme.isDark ? colors.bg : colors.white,
       textAlign: 'center',
       textAlignVertical: 'center',
     },
@@ -582,45 +584,6 @@ export default function NewNoteScreen() {
   const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }).toUpperCase();
   const wc = wordCount(bodyText);
 
-  if (editorMode === 'minimalist') {
-    return (
-      <MinimalistNoteEditor
-        initialTitle={title}
-        initialBody={bodyText}
-        isGlancePinned={false}
-        onSave={({ title: finalTitle, body: finalBody, isGlance }) => {
-          if (!finalTitle && !finalBody) {
-            router.back();
-            return;
-          }
-          const newId = addNote({
-            title: finalTitle,
-            body: finalBody,
-            tag: tag || 'General',
-            pinned: isPinned,
-            is_glance: isGlance,
-          });
-
-          if (isGlance) {
-            useNotesStore.getState().setGlancePinnedNote(newId, true);
-          }
-
-          useToastStore.getState().show(isGlance ? '📌 Pinned to Lock Screen' : (loc.saved || 'Note Saved'));
-          router.back();
-        }}
-        onSwitchToRichMode={(currentTitle, currentBody) => {
-          setTitle(currentTitle);
-          setBodyText(currentBody);
-          richText.current?.setContentHTML(markdownToHtml(currentBody));
-          setEditorMode('rich');
-        }}
-        onBack={() => {
-          router.back();
-        }}
-      />
-    );
-  }
-
   return (
     <View style={s.root}>
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} />
@@ -643,14 +606,25 @@ export default function NewNoteScreen() {
         </View>
         <View style={s.headerRight}>
           <Pressable
-            onPress={() => setEditorMode('minimalist')}
-            style={s.circleBtn}
+            onPress={() => {
+              const nextGlance = !isGlance;
+              setIsGlance(nextGlance);
+              setIsDirty(true);
+              if (noteId.current) {
+                useNotesStore.getState().setGlancePinnedNote(noteId.current, nextGlance);
+              }
+              useToastStore.getState().showToast(
+                nextGlance ? '📌 Pinned to Glance lock screen' : 'Unpinned from Glance',
+                'info'
+              );
+            }}
+            style={[s.circleBtn, isGlance && { borderColor: colors.accent, backgroundColor: colors.accentBg }]}
             hitSlop={theme.hitSlop}
-            accessibilityLabel="Switch to Minimalist Mode"
+            accessibilityLabel={isGlance ? 'Unpin from Glance lock screen' : 'Pin to Glance lock screen'}
           >
-            <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
-              <Rect x="4" y="4" width="16" height="16" rx="3" />
-              <Path d="M9 12h6" />
+            <Svg viewBox="0 0 24 24" width={20} height={20} fill={isGlance ? colors.accent : "none"} stroke={isGlance ? colors.accent : colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+              <Path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+              <Path d="M9 17v1a3 3 0 0 0 6 0v-1" />
             </Svg>
           </Pressable>
           <Pressable 

@@ -29,7 +29,7 @@ export const BentoCard = React.memo(({
 }: BentoCardProps) => {
     if (!note) return null;
     const { title, body: preview, tag, pinned } = note;
-    const { colors, radius, shadow, font } = useTheme();
+    const { colors, radius, shadow, font, isDark } = useTheme();
     const type = useTypography();
     const cleanPreview = stripMarkdown(preview);
     const pressed = useSharedValue(0);
@@ -171,7 +171,7 @@ export const BentoCard = React.memo(({
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                         {note.is_glance ? (
                             <View style={[s.tagChip, { backgroundColor: colors.accent, borderColor: colors.accent }]}>
-                                <Text style={[s.tagText, { color: colors.white }]}>📌 Glance</Text>
+                                <Text style={[s.tagText, { color: isDark ? colors.bg : colors.white }]}>📌 Glance</Text>
                             </View>
                         ) : null}
                         {tag ? (

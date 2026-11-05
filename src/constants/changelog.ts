@@ -21,6 +21,28 @@ export interface ChangelogItem {
 
 export const APP_CHANGELOG: ChangelogItem[] = [
     {
+        version: "2.19.32",
+        date: "2026-11-05",
+        title: {
+            en: "Mononote Minimalist Theme & Glance Lock Screen Integration",
+            hi: "मोनोनोट मिनिमलिस्ट थीम और ग्लांस लॉक स्क्रीन एकीकरण",
+        },
+        changes: {
+            en: [
+                "Theme: Added dedicated Mononote theme with warm off-white, pure OLED dark mode, and high-contrast minimal aesthetics across the entire app.",
+                "Glance Note: Integrated native Android ongoing lock screen notifications with 1-tap Done and Dismiss actions directly from the editor header.",
+                "UI/UX: Removed fragmented editor mode toggles in favor of the seamless full-app Mononote theme experience.",
+                "Contrast: Optimized action buttons and badges for flawless contrast in both light and dark minimalist modes."
+            ],
+            hi: [
+                "थीम: पूरे ऐप में वार्म ऑफ-व्हाइट, प्योर OLED डार्क मोड और हाई-कंट्रास्ट मिनिमल लुक के साथ समर्पित मोनोनोट थीम जोड़ी गई।",
+                "ग्लांस नोट: एडिटर हेडर से सीधे 1-टैप डन और डिसमिस क्रियाओं के साथ नेटिव एंड्रॉइड लॉक स्क्रीन नोटिफिकेशन जोड़ा गया।",
+                "UI/UX: निर्बाध फुल-ऐप मोनोनोट थीम अनुभव के लिए एडिटर मोड टॉगल को हटाया गया।",
+                "कंट्रास्ट: लाइट और डार्क दोनों मोड्स में उत्कृष्ट पठनीयता के लिए बटन और बैज को अनुकूलित किया गया।"
+            ]
+        }
+    },
+    {
     version: "2.17.34",
     date: "2026-04-23",
     title: {
