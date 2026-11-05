@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import * as SQLite from 'expo-sqlite';
 import { log } from '../utils/Logger';
 import type { SyncStatus } from '../types/note';
+import { glanceService } from '../services/glanceService';
 
 // Open (or create) the SQLite database
 const DB_NAME = 'saral_lekhan.db';
@@ -33,6 +34,7 @@ export interface Note {
   folder_name: string | null;
   sync_status: SyncStatus;
   labels: string[] | null;
+  is_glance?: boolean;
 }
 
 const ALL_TAG = '__all__';
@@ -49,6 +51,7 @@ const REQUIRED_COLUMNS: { name: string; definition: string }[] = [
   { name: 'folder_name',     definition: 'TEXT DEFAULT NULL' },
   { name: 'sync_status',     definition: "TEXT DEFAULT 'local_only'" },
   { name: 'labels',          definition: 'TEXT DEFAULT NULL' },
+  { name: 'is_glance',       definition: 'INTEGER DEFAULT 0' },
 ];
 
 // ─── AddNote input type ────────────────────────────────────────────────
@@ -61,6 +64,7 @@ type AddNoteInput = {
   pinned: boolean;
   folder_name?: string | null;
   labels?: string[] | null;
+  is_glance?: boolean;
 };
 
 // ─── Store Interface ───────────────────────────────────────────────────
@@ -70,7 +74,7 @@ interface NotesState {
   initDB: () => void;
   loadNotes: () => void;
   addNote: (note: AddNoteInput) => number;
-  updateNote: (id: number, updates: Partial<Pick<Note, 'title' | 'body' | 'tag' | 'pinned' | 'folder_name' | 'labels'>>) => void;
+  updateNote: (id: number, updates: Partial<Pick<Note, 'title' | 'body' | 'tag' | 'pinned' | 'folder_name' | 'labels' | 'is_glance'>>) => void;
   deleteNote: (id: number) => void;
   bulkDeleteNotes: (ids: number[]) => void;
   restoreNote: (id: number) => void;
@@ -79,6 +83,7 @@ interface NotesState {
   getNotesFilteredByTag: (tag: string) => Note[];
   getDeletedNotes: () => Note[];
   getUniqueTags: () => string[];
+  setGlancePinnedNote: (id: number, pinned: boolean) => Promise<boolean>;
   // ─── New methods (Phase 1 & 5) ────────────────────────────────────
   resetDB: () => Promise<void>;
   bootstrap: (initialNotesJson?: string) => void;
@@ -109,6 +114,7 @@ function parseNoteRow(row: any): Note {
     folder_name: row.folder_name || null,
     sync_status: (row.sync_status as SyncStatus) || 'local_only',
     labels: labels,
+    is_glance: row.is_glance === 1,
   };
 }
 
@@ -244,6 +250,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
       folder_name: note.folder_name || null,
       sync_status: 'local_only',
       labels: note.labels || null,
+      is_glance: note.is_glance ?? false,
     };
 
     log.info(`Adding new note: ${newNote.title}`);
@@ -253,12 +260,13 @@ export const useNotesStore = create<NotesState>((set, get) => ({
 
     db.transaction((tx: any) => {
       tx.executeSql(
-        `INSERT INTO notes (id, title, body, tag, created_at, updated_at, pinned, is_deleted, folder_name, sync_status, labels)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?);`,
+        `INSERT INTO notes (id, title, body, tag, created_at, updated_at, pinned, is_deleted, folder_name, sync_status, labels, is_glance)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?);`,
         [
           newNote.id, newNote.title, newNote.body, newNote.tag,
           newNote.created_at, newNote.updated_at, newNote.pinned ? 1 : 0,
-          newNote.folder_name, newNote.sync_status, labelsJson
+          newNote.folder_name, newNote.sync_status, labelsJson,
+          newNote.is_glance ? 1 : 0
         ]
       );
     }, (err: any) => {
@@ -286,11 +294,11 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     db.transaction((tx: any) => {
       tx.executeSql(
         `UPDATE notes SET title = ?, body = ?, tag = ?, updated_at = ?, pinned = ?,
-         folder_name = ?, sync_status = ?, labels = ?
+         folder_name = ?, sync_status = ?, labels = ?, is_glance = ?
          WHERE id = ?;`,
         [
           merged.title, merged.body, merged.tag, merged.updated_at, merged.pinned ? 1 : 0,
-          merged.folder_name, merged.sync_status, labelsJson,
+          merged.folder_name, merged.sync_status, labelsJson, merged.is_glance ? 1 : 0,
           id
         ]
       );
@@ -307,12 +315,55 @@ export const useNotesStore = create<NotesState>((set, get) => ({
   },
 
   deleteNote: (id) => {
+    const target = get().notes.find(n => n.id === id);
+    if (target?.is_glance) {
+      glanceService.clearGlanceNote();
+    }
     set((state) => ({
-      notes: state.notes.map((n) => n.id === id ? { ...n, is_deleted: true } : n)
+      notes: state.notes.map((n) => n.id === id ? { ...n, is_deleted: true, is_glance: false } : n)
     }));
     db.transaction((tx: any) => {
-      tx.executeSql(`UPDATE notes SET is_deleted = 1 WHERE id = ?;`, [id]);
+      tx.executeSql(`UPDATE notes SET is_deleted = 1, is_glance = 0 WHERE id = ?;`, [id]);
     });
+  },
+
+  setGlancePinnedNote: async (id: number, pinned: boolean) => {
+    const target = get().notes.find(n => n.id === id);
+    if (!target) return false;
+
+    if (pinned) {
+      // Unpin any other note from glance
+      set((state) => ({
+        notes: state.notes.map((n) => ({
+          ...n,
+          is_glance: n.id === id,
+        })),
+      }));
+
+      db.transaction((tx: any) => {
+        tx.executeSql(`UPDATE notes SET is_glance = 0 WHERE is_glance = 1;`);
+        tx.executeSql(`UPDATE notes SET is_glance = 1 WHERE id = ?;`, [id]);
+      });
+
+      const success = await glanceService.postGlanceNote({
+        id: target.id,
+        title: target.title,
+        body: target.body,
+      });
+
+      return success;
+    } else {
+      set((state) => ({
+        notes: state.notes.map((n) => n.id === id ? { ...n, is_glance: false } : n),
+      }));
+
+      db.transaction((tx: any) => {
+        tx.executeSql(`UPDATE notes SET is_glance = 0 WHERE id = ?;`, [id]);
+      });
+
+      await glanceService.clearGlanceNote();
+      return true;
+    }
   },
 
   bulkDeleteNotes: (ids) => {

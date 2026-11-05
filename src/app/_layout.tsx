@@ -36,6 +36,7 @@ import { useAiStore } from '../store/aiStore';
 import { useNotesStore } from '../store/notesStore';
 import { useBackupStore } from '../store/backupStore';
 import { useRuntimeUxFlagsStore } from '../store/runtimeUxFlagsStore';
+import { glanceService } from '../services/glanceService';
 import { log } from '../utils/Logger';
 import { shallow } from 'zustand/shallow';
 
@@ -142,8 +143,14 @@ export function RootLayout(props: any) {
       }
     });
 
+    const glanceSub = glanceService.onMarkDone((noteId) => {
+      log.info('Glance note marked done from notification', { noteId });
+      useNotesStore.getState().deleteNote(noteId);
+    });
+
     return () => {
       subscription.remove();
+      glanceSub?.remove();
     };
   }, []);
 

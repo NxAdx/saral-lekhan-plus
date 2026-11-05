@@ -8,6 +8,7 @@
   <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <queries>
     <intent>
       <action android:name="android.intent.action.VIEW"/>
@@ -42,6 +43,15 @@
         android:exported="true">
         <intent-filter>
             <action android:name="com.sarallekhan.INSTALL_STATUS" />
+        </intent-filter>
+    </receiver>
+
+    <receiver
+        android:name=".GlanceActionReceiver"
+        android:exported="false">
+        <intent-filter>
+            <action android:name="com.sarallekhan.GLANCE_MARK_DONE" />
+            <action android:name="com.sarallekhan.GLANCE_DISMISS" />
         </intent-filter>
     </receiver>
   </application>

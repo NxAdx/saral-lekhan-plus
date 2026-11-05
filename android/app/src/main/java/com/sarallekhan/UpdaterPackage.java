@@ -15,6 +15,7 @@ public class UpdaterPackage implements ReactPackage {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new UpdaterModule(reactContext));
         modules.add(new WebServerModule(reactContext));
+        modules.add(new GlanceNotificationModule(reactContext));
         return modules;
     }
 

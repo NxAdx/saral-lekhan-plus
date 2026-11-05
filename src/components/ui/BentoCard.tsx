@@ -169,6 +169,11 @@ export const BentoCard = React.memo(({
                 <View style={s.metaRow}>
                     <Text style={s.date}>{date}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        {note.is_glance ? (
+                            <View style={[s.tagChip, { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                                <Text style={[s.tagText, { color: colors.white }]}>📌 Glance</Text>
+                            </View>
+                        ) : null}
                         {tag ? (
                             <View style={s.tagChip}>
                                 <Text style={s.tagText}>{tag}</Text>

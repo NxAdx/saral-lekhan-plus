@@ -29,6 +29,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRichEditorViewport } from '../../hooks/useRichEditorViewport';
 import { useFooterMeasurement } from '../../hooks/useFooterMeasurement';
 import { useToastStore } from '../../store/toastStore';
+import { MinimalistNoteEditor } from '../../components/ui/MinimalistNoteEditor';
+import { EditorMode } from '../../store/settingsStore';
 
 export default function NewNoteScreen() {
   const router = useRouter();
@@ -45,6 +47,7 @@ export default function NewNoteScreen() {
   const [title, setTitle] = useState('');
   const [tag, setTag] = useState('');
   const [isPinned, setIsPinned] = useState(false);
+  const [editorMode, setEditorMode] = useState<EditorMode>(settings.defaultEditorMode || 'minimalist');
   const [bodyText, setBodyText] = useState(''); // Text representation for word count
   const [editorOffset, setEditorOffset] = useState(0);
 
@@ -579,6 +582,45 @@ export default function NewNoteScreen() {
   const dateStr = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }).toUpperCase();
   const wc = wordCount(bodyText);
 
+  if (editorMode === 'minimalist') {
+    return (
+      <MinimalistNoteEditor
+        initialTitle={title}
+        initialBody={bodyText}
+        isGlancePinned={false}
+        onSave={({ title: finalTitle, body: finalBody, isGlance }) => {
+          if (!finalTitle && !finalBody) {
+            router.back();
+            return;
+          }
+          const newId = addNote({
+            title: finalTitle,
+            body: finalBody,
+            tag: tag || 'General',
+            pinned: isPinned,
+            is_glance: isGlance,
+          });
+
+          if (isGlance) {
+            useNotesStore.getState().setGlancePinnedNote(newId, true);
+          }
+
+          useToastStore.getState().show(isGlance ? '📌 Pinned to Lock Screen' : (loc.saved || 'Note Saved'));
+          router.back();
+        }}
+        onSwitchToRichMode={(currentTitle, currentBody) => {
+          setTitle(currentTitle);
+          setBodyText(currentBody);
+          richText.current?.setContentHTML(markdownToHtml(currentBody));
+          setEditorMode('rich');
+        }}
+        onBack={() => {
+          router.back();
+        }}
+      />
+    );
+  }
+
   return (
     <View style={s.root}>
       <StatusBar barStyle={theme.isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} />
@@ -600,6 +642,17 @@ export default function NewNoteScreen() {
           )}
         </View>
         <View style={s.headerRight}>
+          <Pressable
+            onPress={() => setEditorMode('minimalist')}
+            style={s.circleBtn}
+            hitSlop={theme.hitSlop}
+            accessibilityLabel="Switch to Minimalist Mode"
+          >
+            <Svg viewBox="0 0 24 24" width={20} height={20} fill="none" stroke={colors.ink} strokeWidth={theme.strokeWidth.sw} strokeLinecap="round" strokeLinejoin="round">
+              <Rect x="4" y="4" width="16" height="16" rx="3" />
+              <Path d="M9 12h6" />
+            </Svg>
+          </Pressable>
           <Pressable 
             onPress={() => {
               const newPinned = !isPinned;

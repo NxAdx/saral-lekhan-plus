@@ -7,6 +7,7 @@ import { getDeviceDefaultLanguage } from '../i18n/deviceLocale';
 export type AppLanguage = 'En' | 'Hi' | 'Bn' | 'Te' | 'Mr' | 'Ta';
 export type NightMode = 'system' | 'light' | 'dark';
 export type AppFontType = 'hind' | 'poppins' | 'notoSans' | 'baloo2';
+export type EditorMode = 'minimalist' | 'rich';
 
 export function normalizeAppFont(_font?: string | null): AppFontType {
     return 'hind';
@@ -24,6 +25,8 @@ interface SettingsState {
     ttsEnabled: boolean;
     highContrast: boolean;
     largeTouch: boolean;
+    defaultEditorMode: EditorMode;
+    activeGlanceNoteId: number | null;
 
     syncDeviceLanguageIfDefault: () => void;
     setLanguage: (l: AppLanguage) => void;
@@ -36,6 +39,8 @@ interface SettingsState {
     setTtsEnabled: (b: boolean) => void;
     setHighContrast: (b: boolean) => void;
     setLargeTouch: (b: boolean) => void;
+    setDefaultEditorMode: (mode: EditorMode) => void;
+    setActiveGlanceNoteId: (id: number | null) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -52,6 +57,11 @@ export const useSettingsStore = create<SettingsState>()(
             ttsEnabled: true,
             highContrast: false,
             largeTouch: false,
+            defaultEditorMode: 'minimalist',
+            activeGlanceNoteId: null,
+
+            setDefaultEditorMode: (mode: EditorMode) => set({ defaultEditorMode: mode }),
+            setActiveGlanceNoteId: (id: number | null) => set({ activeGlanceNoteId: id }),
 
             syncDeviceLanguageIfDefault: () => {
                 const state = get();
